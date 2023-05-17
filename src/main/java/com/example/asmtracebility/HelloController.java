@@ -87,7 +87,7 @@ public class HelloController {
     private TextField searchText;
 
     ObservableList<Data> data = FXCollections.observableArrayList();
-    List<String> searchOptions = Arrays.asList("Component", "PanelBarcode", "PanelName", "BoardBarcode", "Station", "MatrixIndexX", "MatrixIndexY", "RefDesignator", "ComponentBarcode", "Batch", "OriginalQuanity", "PackagingUID", "ManufactureDate", "Manufacturer", "MSDLevel", " Serial", "Supplier", "ExpireDate" );
+    List<String> searchOptions = Arrays.asList("Component", "PanelBarcode", "PanelName", "BoardBarcode", "RefDesignator", "ComponentBarcode", "Batch", "OriginalQuanity", "PackagingUID", "ManufactureDate", "Manufacturer", "MSDLevel", " Serial", "Supplier", "ExpireDate" );
     @FXML
     private ChoiceBox<String> myChoiceBox;
 
@@ -115,11 +115,14 @@ public class HelloController {
 //        colSupplier.setCellValueFactory(new PropertyValueFactory<>("Supplier"));
         colExpireDate.setCellValueFactory(new PropertyValueFactory<>("Expire_Date"));
 
+    }
+
+    @FXML
+    void btnSearchClicked(ActionEvent event) {
+        String selectedValue = myChoiceBox.getValue();
+        String searchTextValue = searchText.getText();
 
         try (Connection connection = DatabaseConnection.getConnection();
-//             "SELECT ComponentType.TypeName as component, Panel.Name as Panel_Name, TracePanel.Barcode as Board_Barcode , Station.Name as Station,Panel.MatrixIndexX as Matrix_Index_X, Panel.MatrixIndexY as Matrix_Index_Y, RefDesignator.Name as Ref_Designator, ComponentBarcode as Component_Barcode, PackagingUnit.Batch as Batch, PackagingUnit.OriginalQuantity as Original_Quanity, PackagingUnit.PackagingUniqueId as PackagingUID, PackagingUnit.ManufactureDate as Manufacture_Date, Manufacturer.Name as Manufacturer, PackagingUnit.MsdLevel as MSD_Level, PackagingUnit.Serial as Serial, Supplier.Name as Supplier, PackagingUnit.ExpiryDate as Expire_Date   \n" +
-//                     "FROM PCBBarcode, TraceData, TracePanel, Placement, Charge, PackagingUnit, ComponentType, Panel, RefDesignator, Supplier, Manufacturer, Station\n" +
-//                     "WHERE TraceData.PCBBarcodeId=PCBBarcode.Id and TracePanel.TraceDataId = TraceData.Id and Placement.PanelId = TracePanel.PanelId and Placement.ChargeId = Charge.Id and Charge.PackagingUnitId = PackagingUnit.Id and ComponentType.Id = PackagingUnit.ComponentTypeId and Panel.Id = TracePanel.PanelId and RefDesignator.Id = Placement.RefDesignatorId and PackagingUnit.SupplierId = Supplier.Id and PackagingUnit.ManufacturerId = Manufacturer.Id and TraceData.StationId = Station.Id"
              PreparedStatement statement = connection.prepareStatement("SELECT DISTINCT\n" +
                      "  ComponentType.TypeName AS Component,\n" +
                      "  PCBBarcode.Barcode AS Panel_Barcode,\n" +
@@ -157,13 +160,13 @@ public class HelloController {
                      "  Panel_Name ASC,\n" +
                      "  Board_Barcode ASC;");
              ResultSet resultSet = statement.executeQuery()) {
-
+            data.clear();
             while (resultSet.next()){
                 String component = resultSet.getString("Component");
                 String panelBarcode = resultSet.getString("Panel_Barcode");
                 String panelName = resultSet.getString("Panel_Name");
                 //String station = resultSet.getString("Station");
-               // String matrixIndexX = resultSet.getString("Matrix_Index_X");
+                // String matrixIndexX = resultSet.getString("Matrix_Index_X");
                 //String matrixIndexY = resultSet.getString("Matrix_Index_Y");
                 String boardBarcode = resultSet.getString("Board_Barcode");
                 String refDesignator = resultSet.getString("RefDesignator");
@@ -187,43 +190,36 @@ public class HelloController {
         }
 
 
-    }
-
-    @FXML
-    void btnSearchClicked(ActionEvent event) {
-        String selectedValue = myChoiceBox.getValue();
-        String searchTextValue = searchText.getText();
-
-        FilteredList<Data> filteredData = new FilteredList<>(data, p -> true);
-        if (!searchTextValue.isEmpty()) {
-            switch (selectedValue) {
-                case "Component":
-                    filteredData.setPredicate(p -> {
-                        String component = p.getComponent();
-                        if (component == null) {
-                            return false;
-                        }
-                        return component.contains(searchTextValue);
-                    });
-                    break;
-                case "PanelName":
-                    filteredData.setPredicate(p -> {
-                        String panelName = p.getPanel_Name();
-                        if (panelName == null) {
-                            return false;
-                        }
-                        return panelName.contains(searchTextValue);
-                    });
-                    break;
-                case "BoardBarcode":
-                    filteredData.setPredicate(p -> {
-                        String boardBarcode = p.getBoard_Barcode();
-                        if (boardBarcode == null) {
-                            return false;
-                        }
-                        return boardBarcode.contains(searchTextValue);
-                    });
-                    break;
+//        FilteredList<Data> filteredData = new FilteredList<>(data, p -> true);
+//        if (!searchTextValue.isEmpty()) {
+//            switch (selectedValue) {
+//                case "Component":
+//                    filteredData.setPredicate(p -> {
+//                        String component = p.getComponent();
+//                        if (component == null) {
+//                            return false;
+//                        }
+//                        return component.contains(searchTextValue);
+//                    });
+//                    break;
+//                case "PanelName":
+//                    filteredData.setPredicate(p -> {
+//                        String panelName = p.getPanel_Name();
+//                        if (panelName == null) {
+//                            return false;
+//                        }
+//                        return panelName.contains(searchTextValue);
+//                    });
+//                    break;
+//                case "BoardBarcode":
+//                    filteredData.setPredicate(p -> {
+//                        String boardBarcode = p.getBoard_Barcode();
+//                        if (boardBarcode == null) {
+//                            return false;
+//                        }
+//                        return boardBarcode.contains(searchTextValue);
+//                    });
+//                    break;
 //                case "Station":
 //                    filteredData.setPredicate(p -> {
 //                        String station = p.getStation();
@@ -251,60 +247,60 @@ public class HelloController {
 //                        return matrixIndexY.contains(searchTextValue);
 //                    });
 //                    break;
-                case "RefDesignator":
-                    filteredData.setPredicate(p -> {
-                        String refDesignator = p.getRef_Designator();
-                        if (refDesignator == null) {
-                            return false;
-                        }
-                        return refDesignator.contains(searchTextValue);
-                    });
-                    break;
-                case "ComponentBarcode":
-                    filteredData.setPredicate(p -> {
-                        String componentBarcode = p.getComponent_Barcode();
-                        if (componentBarcode == null) {
-                            return false;
-                        }
-                        return componentBarcode.contains(searchTextValue);
-                    });
-                    break;
-                case "Batch":
-                    filteredData.setPredicate(p -> {
-                        String batch = p.getBatch();
-                        if (batch == null) {
-                            return false;
-                        }
-                        return batch.contains(searchTextValue);
-                    });
-                    break;
-                case "OriginalQuanity":
-                    filteredData.setPredicate(p -> {
-                        String originalQuanity = p.getOriginal_Quanity();
-                        if (originalQuanity == null) {
-                            return false;
-                        }
-                        return originalQuanity.contains(searchTextValue);
-                    });
-                    break;
-                case "PackagingUID":
-                    filteredData.setPredicate(p -> {
-                        String packagingUid = p.getPackaging_UID();
-                        if (packagingUid == null) {
-                            return false;
-                        }
-                        return packagingUid.contains(searchTextValue);
-                    });
-                    break;
-                case "ManufactureDate":
-                    filteredData.setPredicate(p -> {
-                        String manufactureDate = p.getManufacture_Date();
-                        if (manufactureDate == null) {
-                            return false;
-                        }
-                        return manufactureDate.contains(searchTextValue);
-                    });
-                    break;
+//                case "RefDesignator":
+//                    filteredData.setPredicate(p -> {
+//                        String refDesignator = p.getRef_Designator();
+//                        if (refDesignator == null) {
+//                            return false;
+//                        }
+//                        return refDesignator.contains(searchTextValue);
+//                    });
+//                    break;
+//                case "ComponentBarcode":
+//                    filteredData.setPredicate(p -> {
+//                        String componentBarcode = p.getComponent_Barcode();
+//                        if (componentBarcode == null) {
+//                            return false;
+//                        }
+//                        return componentBarcode.contains(searchTextValue);
+//                    });
+//                    break;
+//                case "Batch":
+//                    filteredData.setPredicate(p -> {
+//                        String batch = p.getBatch();
+//                        if (batch == null) {
+//                            return false;
+//                        }
+//                        return batch.contains(searchTextValue);
+//                    });
+//                    break;
+//                case "OriginalQuanity":
+//                    filteredData.setPredicate(p -> {
+//                        String originalQuanity = p.getOriginal_Quanity();
+//                        if (originalQuanity == null) {
+//                            return false;
+//                        }
+//                        return originalQuanity.contains(searchTextValue);
+//                    });
+//                    break;
+//                case "PackagingUID":
+//                    filteredData.setPredicate(p -> {
+//                        String packagingUid = p.getPackaging_UID();
+//                        if (packagingUid == null) {
+//                            return false;
+//                        }
+//                        return packagingUid.contains(searchTextValue);
+//                    });
+//                    break;
+//                case "ManufactureDate":
+//                    filteredData.setPredicate(p -> {
+//                        String manufactureDate = p.getManufacture_Date();
+//                        if (manufactureDate == null) {
+//                            return false;
+//                        }
+//                        return manufactureDate.contains(searchTextValue);
+//                    });
+//                    break;
 //                case "Manufacturer":
 //                    filteredData.setPredicate(p -> {
 //                        String manufacturer = p.getManufacturer();
@@ -314,24 +310,24 @@ public class HelloController {
 //                        return manufacturer.contains(searchTextValue);
 //                    });
 //                    break;
-                case "MSDLevel":
-                    filteredData.setPredicate(p -> {
-                        String msdLevel = p.getMSD_Level();
-                        if (msdLevel == null) {
-                            return false;
-                        }
-                        return msdLevel.contains(searchTextValue);
-                    });
-                    break;
-                case "Serial":
-                    filteredData.setPredicate(p -> {
-                        String serial = p.getSerial();
-                        if (serial == null) {
-                            return false;
-                        }
-                        return serial.contains(searchTextValue);
-                    });
-                    break;
+//                case "MSDLevel":
+//                    filteredData.setPredicate(p -> {
+//                        String msdLevel = p.getMSD_Level();
+//                        if (msdLevel == null) {
+//                            return false;
+//                        }
+//                        return msdLevel.contains(searchTextValue);
+//                    });
+//                    break;
+//                case "Serial":
+//                    filteredData.setPredicate(p -> {
+//                        String serial = p.getSerial();
+//                        if (serial == null) {
+//                            return false;
+//                        }
+//                        return serial.contains(searchTextValue);
+//                    });
+//                    break;
 //                case "Supplier":
 //                    filteredData.setPredicate(p -> {
 //                        String supplier = p.getSupplier();
@@ -341,23 +337,23 @@ public class HelloController {
 //                        return supplier.contains(searchTextValue);
 //                    });
 //                    break;
-                case "ExpireDate":
-                    filteredData.setPredicate(p -> {
-                        String expireDate = p.getExpire_Date();
-                        if (expireDate == null) {
-                            return false;
-                        }
-                        return expireDate.contains(searchTextValue);
-                    });
-                    break;
-                default:
-                    filteredData.setPredicate(p -> true);
-                    break;
-            }
-            myTableView.setItems(filteredData);
-        } else {
-            myTableView.setItems(data);
-        }
+//                case "ExpireDate":
+//                    filteredData.setPredicate(p -> {
+//                        String expireDate = p.getExpire_Date();
+//                        if (expireDate == null) {
+//                            return false;
+//                        }
+//                        return expireDate.contains(searchTextValue);
+//                    });
+//                    break;
+//                default:
+//                    filteredData.setPredicate(p -> true);
+//                    break;
+//            }
+//            myTableView.setItems(filteredData);
+//        } else {
+//            myTableView.setItems(data);
+//        }
     }
     @FXML
     void btnResetClicked(ActionEvent event) {
