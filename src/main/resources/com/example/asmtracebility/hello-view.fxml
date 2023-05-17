@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane fx:id="borderPane" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.asmtracebility.HelloController">
+   <center>
+      <AnchorPane fx:id="myAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="290.0" prefWidth="879.0">
+         <children>
+            <Label alignment="CENTER" contentDisplay="CENTER" layoutX="408.0" layoutY="14.0" text="ASM Studio" />
+            <Button fx:id="search" layoutX="301.0" layoutY="188.0" mnemonicParsing="false" onAction="#btnSearchClicked" prefHeight="33.0" prefWidth="77.0" text="Search" />
+            <ChoiceBox fx:id="myChoiceBox" layoutX="365.0" layoutY="144.0" prefWidth="150.0" />
+            <TextField fx:id="searchText" layoutX="318.0" layoutY="74.0" prefHeight="55.0" prefWidth="243.0" promptText="Search Here" />
+            <Button fx:id="reset" layoutX="401.0" layoutY="188.0" mnemonicParsing="false" onAction="#btnResetClicked" prefHeight="33.0" prefWidth="77.0" text="Reset" />
+            <Button fx:id="export" layoutX="502.0" layoutY="188.0" mnemonicParsing="false" onAction="#btnExportClicked" prefHeight="33.0" prefWidth="77.0" text="Export" />
+         </children>
+      </AnchorPane>
+   </center>
+   <bottom>
+      <ScrollPane fx:id="myScrollPane" hbarPolicy="ALWAYS" hmax="5.0" vbarPolicy="ALWAYS" vmax="5.0" BorderPane.alignment="CENTER">
+         <content>
+            <TableView fx:id="myTableView" prefHeight="544.0" prefWidth="5000.0">
+              <columns>
+                <TableColumn fx:id="colComponent" prefWidth="119.0" text="Component" />
+                  <TableColumn fx:id="colPanelBarcode" minWidth="0.0" prefWidth="123.0" text="Panel_Barcode" />
+                <TableColumn fx:id="colPanelName" minWidth="0.0" prefWidth="123.0" text="Panel_Name" />
+                  <TableColumn fx:id="colBoardBarcode" prefWidth="109.0" text="Board_Barcode" />
+                  <TableColumn fx:id="colRefDesignator" prefWidth="95.0" text="Ref_Designator" />
+                  <TableColumn fx:id="colComponentBarcode" prefWidth="141.0" text="Component_Barcode" />
+                  <TableColumn fx:id="colBatch" prefWidth="52.0" text="Batch" />
+                  <TableColumn fx:id="colOriginalQuanity" minWidth="4.0" prefWidth="113.0" text="Original_Quanity" />
+                  <TableColumn fx:id="colPackagingUid" minWidth="0.0" prefWidth="97.0" text="Packaging_UID" />
+                  <TableColumn fx:id="colManufactureDate" minWidth="0.0" prefWidth="137.0" text="Manufacture_Date" />
+                  <TableColumn fx:id="colMsdLevel" minWidth="0.0" prefWidth="100.0" text="MSD_Level" />
+                  <TableColumn fx:id="colSerial" minWidth="0.0" prefWidth="59.0" text="Serial" />
+                  <TableColumn fx:id="colExpireDate" minWidth="0.0" prefWidth="131.0" text="Exipre_Date" />
+              </columns>
+            </TableView>
+         </content>
+      </ScrollPane>
+   </bottom>
+</BorderPane>
