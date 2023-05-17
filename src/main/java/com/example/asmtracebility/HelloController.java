@@ -23,7 +23,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.*;
@@ -87,7 +89,7 @@ public class HelloController {
     private TextField searchText;
 
     ObservableList<Data> data = FXCollections.observableArrayList();
-    List<String> searchOptions = Arrays.asList("Component", "PanelBarcode", "PanelName", "BoardBarcode", "RefDesignator", "ComponentBarcode", "Batch", "OriginalQuanity", "PackagingUID", "ManufactureDate", "Manufacturer", "MSDLevel", " Serial", "Supplier", "ExpireDate" );
+    List<String> searchOptions = Arrays.asList("Component", "PanelBarcode", "PanelName", "BoardBarcode", "RefDesignator", "ComponentBarcode", "Batch", "OriginalQuantity", "PackagingUID", "ManufactureDate", "MSDLevel", " Serial", "ExpiryDate" );
     @FXML
     private ChoiceBox<String> myChoiceBox;
 
@@ -119,8 +121,32 @@ public class HelloController {
 
     @FXML
     void btnSearchClicked(ActionEvent event) {
-        String selectedValue = myChoiceBox.getValue();
-        String searchTextValue = searchText.getText();
+       String selectedValue = myChoiceBox.getValue();
+       String searchTextValue = searchText.getText();
+
+        if (searchTextValue.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Empty Search Text");
+            alert.setHeaderText(null);
+            alert.setContentText("Please enter a valid search text.");
+            alert.showAndWait();
+            return;
+        }
+
+        Map<String,String> colMapping = new HashMap<>();
+        colMapping.put("Component" , "ComponentType.TypeName");
+        colMapping.put("PanelBarcode" , "PCBBarcode.Barcode");
+        colMapping.put("PanelName" , "Panel.Name");
+        colMapping.put("BoardBarcode" , "TracePanel.Barcode");
+        colMapping.put("RefDesignator" , "RefDesignator.Name");
+        colMapping.put("ComponentBarcode" , "PackagingUnit.ComponentBarcode");
+        colMapping.put("Batch" , "PackagingUnit.Batch");
+        colMapping.put("OriginalQuantity" , "PackagingUnit.OriginalQuantity");
+        colMapping.put("PackagingUID" , "PackagingUnit.PackagingUniqueID");
+        colMapping.put("ManufactureData" , "PackagingUnit.ManufactureDate");
+        colMapping.put("MSDLevel", "PackagingUnit.MsdLevel");
+        colMapping.put("Serial", "PackagingUnit.Serial");
+        colMapping.put("ExipryDate", "PackagingUnit.ExpiryDate");
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT DISTINCT\n" +
@@ -154,13 +180,18 @@ public class HelloController {
                      "  --JOIN Supplier ON PackagingUnit.SupplierId = Supplier.Id\n" +
                      "\n" +
                      " \n" +
-                     "  where PCBBarcodeId = 32\n" +
+                     "  where " + colMapping.get(selectedValue) + " = ?\n" +
                      "  ORDER BY\n" +
                      "  component ASC,\n" +
                      "  Panel_Name ASC,\n" +
-                     "  Board_Barcode ASC;");
-             ResultSet resultSet = statement.executeQuery()) {
-            data.clear();
+                     "  Board_Barcode ASC;")) {
+             statement.setString(1,searchTextValue);
+             data.clear();
+             ResultSet resultSet = statement.executeQuery();
+
+             boolean dataFound = false;
+
+
             while (resultSet.next()){
                 String component = resultSet.getString("Component");
                 String panelBarcode = resultSet.getString("Panel_Barcode");
@@ -181,8 +212,17 @@ public class HelloController {
                 //String supplier = resultSet.getString("Supplier");
                 String expireDate = resultSet.getString("Expiry_Date");
 
+                dataFound = true;
+
                 data.add(new Data(component,panelBarcode,panelName,boardBarcode,refDesignator,componentBarcode,batch,originalQuanity,packagingUid,manufactureDate,msdLevel,serial,expireDate));
 
+            }
+            if(!dataFound){
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("No Data Found");
+                alert.setHeaderText(null);
+                alert.setContentText("No data matching the search criteria found.");
+                alert.showAndWait();
             }
             myTableView.setItems(data);
         }catch (SQLException | ClassNotFoundException e){
