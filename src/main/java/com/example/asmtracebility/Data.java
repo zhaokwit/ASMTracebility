@@ -103,6 +103,7 @@ public class Data {
     public String getManufacture_Date(){
         return manufactureDate.get();
     }
+
 //    public String getManufacturer(){
 //        return manufacturer.get();
 //    }
@@ -118,5 +119,10 @@ public class Data {
     public String getExpire_Date(){
         return expireDate.get();
     }
+
+    public void setBoardBarcode(String boardBarcode){
+        this.boardBarcode.set(boardBarcode);
+    }
+
 
 }

@@ -22,10 +22,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.*;
@@ -156,11 +153,17 @@ public class HelloController {
                     String panelBarcode = resultSet.getString("Panel_Barcode");
                     String boardBarcode = resultSet.getString("Board_Barcode");
 
-                    System.out.println(panelBarcode + "+" + boardBarcode);
                    // ShopOrderData shopOrderData = new ShopOrderData(panelBarcode, boardBarcode);
                    data.add(new Data(panelBarcode, boardBarcode));
 
                     dataFound = true;
+                }
+                if (!dataFound) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("No Data Found");
+                    alert.setHeaderText(null);
+                    alert.setContentText("No data matching the search criteria found.");
+                    alert.showAndWait();
                 }
                 myTableView.setItems(data);
             }else {
@@ -191,10 +194,11 @@ public class HelloController {
                     String expireDate = resultSet.getString("Expiry_Date");
 
                     dataFound = true;
-
                     data.add(new Data(component, panelBarcode, panelName, boardBarcode, refDesignator, componentBarcode, batch, originalQuanity, packagingUid, manufactureDate, msdLevel, serial, expireDate));
-                    myTableView.setItems(data);
+
                 }
+                processData();
+                myTableView.setItems(data);
                 if (!dataFound) {
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle("No Data Found");
@@ -206,6 +210,52 @@ public class HelloController {
             } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    public void processData(){
+        for (Data topData : data) {
+            // Check if the boardbarcode is empty
+            if (topData.getBoard_Barcode().isEmpty()) {
+                String panelBarcode = topData.getPanel_Barcode();
+                String topPanelName = topData.getPanel_Name();
+                String topPanelNumber = extractPanelNumber(topPanelName);
+                // Find the corresponding "bot" or "top" entry
+                boolean matchFound = false;
+                for (Data otherData : data) {
+                    if (otherData.getPanel_Barcode().equals(panelBarcode) && hasSamePanelNumber(otherData.getPanel_Name(), topPanelNumber)) {
+                        if(!otherData.getBoard_Barcode().isEmpty()){
+                            topData.setBoardBarcode(otherData.getBoard_Barcode());
+                            continue;
+                        }
+                        matchFound = true;
+                        break; // Exit the inner loop once a match is found
+                    }
+                }
+
+                }
+            }
+        }
+
+    private String extractPanelNumber(String panelName) {
+        StringBuilder panelNumbers = new StringBuilder();
+        String[] parts = panelName.split("_");
+        if (parts.length >= 2) {
+            for (int i = 1; i < parts.length; i++) {
+                String panelNumber = parts[i];
+                if (panelNumber.matches("\\d+")) {
+                    panelNumbers.append(panelNumber);
+                }
+            }
+        }
+        return panelNumbers.toString();
+    }
+    private boolean hasSamePanelNumber(String panelName, String panelNumber) {
+        String[] parts = panelName.split("_");
+        if (parts.length >= 2) {
+            String otherPanelNumber = extractPanelNumber(panelName);
+            return otherPanelNumber.equals(panelNumber);
+        }
+        return false;
     }
     private String getQuery(String selectedValue) {
         Map<String, String> colMapping = new HashMap<>();
@@ -225,7 +275,6 @@ public class HelloController {
         colMapping.put("ExipryDate", "PackagingUnit.ExpiryDate");
 
         if (selectedValue.equals("ShopOrder")) {
-            System.out.println("SO selected");
             return "SELECT DISTINCT\n" +
                     "  PCBBarcode.Barcode AS Panel_Barcode,\n" +
                     "  TracePanel.Barcode AS Board_Barcode\n" +
