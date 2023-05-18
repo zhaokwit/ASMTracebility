@@ -45,7 +45,6 @@ public class HelloController {
     @FXML ScrollPane myScrollPane;
     @FXML
     private TableView<Data> myTableView;
-
     @FXML
     private TableColumn<Data, String> colComponent;
     @FXML
@@ -89,7 +88,7 @@ public class HelloController {
     private TextField searchText;
 
     ObservableList<Data> data = FXCollections.observableArrayList();
-    List<String> searchOptions = Arrays.asList("Component", "PanelBarcode", "PanelName", "BoardBarcode", "RefDesignator", "ComponentBarcode", "Batch", "OriginalQuantity", "PackagingUID", "ManufactureDate", "MSDLevel", " Serial", "ExpiryDate" );
+    List<String> searchOptions = Arrays.asList("Component", "PanelBarcode", "ShopOrder", "PanelName", "BoardBarcode", "RefDesignator", "ComponentBarcode", "Batch", "OriginalQuantity", "PackagingUID", "ManufactureDate", "MSDLevel", " Serial", "ExpiryDate" );
     @FXML
     private ChoiceBox<String> myChoiceBox;
 
@@ -121,8 +120,8 @@ public class HelloController {
 
     @FXML
     void btnSearchClicked(ActionEvent event) {
-       String selectedValue = myChoiceBox.getValue();
-       String searchTextValue = searchText.getText();
+        String selectedValue = myChoiceBox.getValue();
+        String searchTextValue = searchText.getText();
 
         if (searchTextValue.isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -133,101 +132,158 @@ public class HelloController {
             return;
         }
 
-        Map<String,String> colMapping = new HashMap<>();
-        colMapping.put("Component" , "ComponentType.TypeName");
-        colMapping.put("PanelBarcode" , "PCBBarcode.Barcode");
-        colMapping.put("PanelName" , "Panel.Name");
-        colMapping.put("BoardBarcode" , "TracePanel.Barcode");
-        colMapping.put("RefDesignator" , "RefDesignator.Name");
-        colMapping.put("ComponentBarcode" , "PackagingUnit.ComponentBarcode");
-        colMapping.put("Batch" , "PackagingUnit.Batch");
-        colMapping.put("OriginalQuantity" , "PackagingUnit.OriginalQuantity");
-        colMapping.put("PackagingUID" , "PackagingUnit.PackagingUniqueID");
-        colMapping.put("ManufactureData" , "PackagingUnit.ManufactureDate");
+        data.clear();
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(getQuery(selectedValue))){
+
+            boolean dataFound = false;
+
+            if (selectedValue.equals("ShopOrder")) {
+                statement.setString(1,searchTextValue);
+                // Remove the unnecessary columns
+                myTableView.getColumns().removeAll(colComponent, colPanelBarcode, colBoardBarcode, colPanelName, colRefDesignator, colComponentBarcode,
+                        colBatch, colOriginalQuanity, colPackagingUid, colManufactureDate, colSerial, colExpireDate,
+                        colMsdLevel);
+
+                // Add the necessary columns
+                myTableView.getColumns().addAll(colPanelBarcode, colBoardBarcode);
+
+                ResultSet resultSet = statement.executeQuery();
+
+                //ObservableList<Data> dataList = FXCollections.observableArrayList();
+                while (resultSet.next()) {
+                    //String shopOrder = resultSet.getString("ShopOrder");
+                    String panelBarcode = resultSet.getString("Panel_Barcode");
+                    String boardBarcode = resultSet.getString("Board_Barcode");
+
+                    System.out.println(panelBarcode + "+" + boardBarcode);
+                   // ShopOrderData shopOrderData = new ShopOrderData(panelBarcode, boardBarcode);
+                   data.add(new Data(panelBarcode, boardBarcode));
+
+                    dataFound = true;
+                }
+                myTableView.setItems(data);
+            }else {
+                myTableView.getColumns().setAll(colComponent, colPanelBarcode, colPanelName, colBoardBarcode,
+                        colRefDesignator, colComponentBarcode, colBatch, colOriginalQuanity, colPackagingUid,
+                        colManufactureDate, colMsdLevel, colSerial, colExpireDate);
+
+                statement.setString(1,searchTextValue);
+                ResultSet resultSet = statement.executeQuery();
+                while (resultSet.next()) {
+                    String component = resultSet.getString("Component");
+                    String panelBarcode = resultSet.getString("Panel_Barcode");
+                    String panelName = resultSet.getString("Panel_Name");
+                    //String station = resultSet.getString("Station");
+                    // String matrixIndexX = resultSet.getString("Matrix_Index_X");
+                    //String matrixIndexY = resultSet.getString("Matrix_Index_Y");
+                    String boardBarcode = resultSet.getString("Board_Barcode");
+                    String refDesignator = resultSet.getString("RefDesignator");
+                    String componentBarcode = resultSet.getString("Component_Barcode");
+                    String batch = resultSet.getString("Batch");
+                    String originalQuanity = resultSet.getString("Original_Quantity");
+                    String packagingUid = resultSet.getString("PackagingUniqueId");
+                    String manufactureDate = resultSet.getString("Manufacture_Date");
+                    //String manufacturer = resultSet.getString("Manufacturer");
+                    String msdLevel = resultSet.getString("MSDLevel");
+                    String serial = resultSet.getString("Serial");
+                    //String supplier = resultSet.getString("Supplier");
+                    String expireDate = resultSet.getString("Expiry_Date");
+
+                    dataFound = true;
+
+                    data.add(new Data(component, panelBarcode, panelName, boardBarcode, refDesignator, componentBarcode, batch, originalQuanity, packagingUid, manufactureDate, msdLevel, serial, expireDate));
+                    myTableView.setItems(data);
+                }
+                if (!dataFound) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("No Data Found");
+                    alert.setHeaderText(null);
+                    alert.setContentText("No data matching the search criteria found.");
+                    alert.showAndWait();
+                }
+            }
+            } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+    private String getQuery(String selectedValue) {
+        Map<String, String> colMapping = new HashMap<>();
+        colMapping.put("Component", "ComponentType.TypeName");
+        colMapping.put("PanelBarcode", "PCBBarcode.Barcode");
+        colMapping.put("ShopOrder", "[Order].Name");
+        colMapping.put("PanelName", "Panel.Name");
+        colMapping.put("BoardBarcode", "TracePanel.Barcode");
+        colMapping.put("RefDesignator", "RefDesignator.Name");
+        colMapping.put("ComponentBarcode", "PackagingUnit.ComponentBarcode");
+        colMapping.put("Batch", "PackagingUnit.Batch");
+        colMapping.put("OriginalQuantity", "PackagingUnit.OriginalQuantity");
+        colMapping.put("PackagingUID", "PackagingUnit.PackagingUniqueID");
+        colMapping.put("ManufactureData", "PackagingUnit.ManufactureDate");
         colMapping.put("MSDLevel", "PackagingUnit.MsdLevel");
         colMapping.put("Serial", "PackagingUnit.Serial");
         colMapping.put("ExipryDate", "PackagingUnit.ExpiryDate");
 
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT DISTINCT\n" +
-                     "  ComponentType.TypeName AS Component,\n" +
-                     "  PCBBarcode.Barcode AS Panel_Barcode,\n" +
-                     "  Panel.Name AS Panel_Name,\n" +
-                     "  TracePanel.Barcode AS Board_Barcode,\n" +
-                     "  RefDesignator.Name AS RefDesignator,\n" +
-                     "  PackagingUnit.ComponentBarcode AS Component_Barcode,\n" +
-                     "  PackagingUnit.Batch As Batch,\n" +
-                     "  PackagingUnit.OriginalQuantity AS Original_Quantity,\n" +
-                     "  PackagingUnit.PackagingUniqueId,\n" +
-                     "  PackagingUnit.ManufactureDate as Manufacture_Date,\n" +
-                     "  PackagingUnit.MsdLevel,\n" +
-                     "  PackagingUnit.Serial,\n" +
-                     "  --Manufacturer.Name AS Manufacturer\n" +
-                     "  --Supplier.Name AS Supplier,\n" +
-                     "  PackagingUnit.ExpiryDate as Expiry_Date\n" +
-                     "\n" +
-                     "FROM\n" +
-                     "  PCBBarcode\n" +
-                     "  JOIN TraceData ON TraceData.PCBBarcodeId = PCBBarcode.Id\n" +
-                     "  JOIN TracePanel ON TracePanel.TraceDataId = TraceData.Id\n" +
-                     "  JOIN Placement ON Placement.PanelId = TracePanel.PanelId\n" +
-                     "  JOIN Charge ON Charge.Id = Placement.ChargeId\n" +
-                     "  JOIN PackagingUnit ON PackagingUnit.Id = Charge.PackagingUnitId\n" +
-                     "  JOIN ComponentType ON ComponentType.Id = PackagingUnit.ComponentTypeId\n" +
-                     "  JOIN Panel ON Panel.Id = TracePanel.PanelId\n" +
-                     "  JOIN RefDesignator ON RefDesignator.Id = Placement.RefDesignatorId\n" +
-                     "  --JOIN Manufacturer ON Manufacturer.Id = PackagingUnit.ManufacturerId\n" +
-                     "  --JOIN Supplier ON PackagingUnit.SupplierId = Supplier.Id\n" +
-                     "\n" +
-                     " \n" +
-                     "  where " + colMapping.get(selectedValue) + " = ?\n" +
-                     "  ORDER BY\n" +
-                     "  component ASC,\n" +
-                     "  Panel_Name ASC,\n" +
-                     "  Board_Barcode ASC;")) {
-             statement.setString(1,searchTextValue);
-             data.clear();
-             ResultSet resultSet = statement.executeQuery();
-
-             boolean dataFound = false;
-
-
-            while (resultSet.next()){
-                String component = resultSet.getString("Component");
-                String panelBarcode = resultSet.getString("Panel_Barcode");
-                String panelName = resultSet.getString("Panel_Name");
-                //String station = resultSet.getString("Station");
-                // String matrixIndexX = resultSet.getString("Matrix_Index_X");
-                //String matrixIndexY = resultSet.getString("Matrix_Index_Y");
-                String boardBarcode = resultSet.getString("Board_Barcode");
-                String refDesignator = resultSet.getString("RefDesignator");
-                String componentBarcode = resultSet.getString("Component_Barcode");
-                String batch = resultSet.getString("Batch");
-                String originalQuanity = resultSet.getString("Original_Quantity");
-                String packagingUid = resultSet.getString("PackagingUniqueId");
-                String manufactureDate = resultSet.getString("Manufacture_Date");
-                //String manufacturer = resultSet.getString("Manufacturer");
-                String msdLevel = resultSet.getString("MSDLevel");
-                String serial = resultSet.getString("Serial");
-                //String supplier = resultSet.getString("Supplier");
-                String expireDate = resultSet.getString("Expiry_Date");
-
-                dataFound = true;
-
-                data.add(new Data(component,panelBarcode,panelName,boardBarcode,refDesignator,componentBarcode,batch,originalQuanity,packagingUid,manufactureDate,msdLevel,serial,expireDate));
-
-            }
-            if(!dataFound){
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("No Data Found");
-                alert.setHeaderText(null);
-                alert.setContentText("No data matching the search criteria found.");
-                alert.showAndWait();
-            }
-            myTableView.setItems(data);
-        }catch (SQLException | ClassNotFoundException e){
-            e.printStackTrace();
+        if (selectedValue.equals("ShopOrder")) {
+            System.out.println("SO selected");
+            return "SELECT DISTINCT\n" +
+                    "  PCBBarcode.Barcode AS Panel_Barcode,\n" +
+                    "  TracePanel.Barcode AS Board_Barcode\n" +
+                    "FROM\n" +
+                    "  PCBBarcode\n" +
+                    "  JOIN TraceData ON TraceData.PCBBarcodeId = PCBBarcode.Id\n" +
+                    "  JOIN TracePanel ON TracePanel.TraceDataId = TraceData.Id\n" +
+                    "  JOIN Panel ON Panel.Id = TracePanel.PanelId\n" +
+                    "  JOIN TraceJob ON TraceJob.TraceDataId = TraceData.Id\n" +
+                    "  JOIN Job ON Job.Id = TraceJob.JobId\n" +
+                    "  JOIN [Order] ON [Order].Id = Job.OrderId\n" +
+                    "WHERE\n" +
+                    "[Order].Name" + " = ?\n" +
+                    "AND TracePanel.Barcode <> ''\n"+
+                    "Order BY\n" +
+                    "Board_Barcode ASC;";
+        } else {
+            return "SELECT DISTINCT\n" +
+                    "  ComponentType.TypeName AS Component,\n" +
+                    "  PCBBarcode.Barcode AS Panel_Barcode,\n" +
+                    "  Panel.Name AS Panel_Name,\n" +
+                    "  TracePanel.Barcode AS Board_Barcode,\n" +
+                    "  RefDesignator.Name AS RefDesignator,\n" +
+                    "  PackagingUnit.ComponentBarcode AS Component_Barcode,\n" +
+                    "  PackagingUnit.Batch As Batch,\n" +
+                    "  PackagingUnit.OriginalQuantity AS Original_Quantity,\n" +
+                    "  PackagingUnit.PackagingUniqueId,\n" +
+                    "  PackagingUnit.ManufactureDate as Manufacture_Date,\n" +
+                    "  PackagingUnit.MsdLevel,\n" +
+                    "  PackagingUnit.Serial,\n" +
+                    "  --Manufacturer.Name AS Manufacturer\n" +
+                    "  --Supplier.Name AS Supplier,\n" +
+                    "  PackagingUnit.ExpiryDate as Expiry_Date\n" +
+                    "\n" +
+                    "FROM\n" +
+                    "  PCBBarcode\n" +
+                    "  JOIN TraceData ON TraceData.PCBBarcodeId = PCBBarcode.Id\n" +
+                    "  JOIN TracePanel ON TracePanel.TraceDataId = TraceData.Id\n" +
+                    "  JOIN Placement ON Placement.PanelId = TracePanel.PanelId\n" +
+                    "  JOIN Charge ON Charge.Id = Placement.ChargeId\n" +
+                    "  JOIN PackagingUnit ON PackagingUnit.Id = Charge.PackagingUnitId\n" +
+                    "  JOIN ComponentType ON ComponentType.Id = PackagingUnit.ComponentTypeId\n" +
+                    "  JOIN Panel ON Panel.Id = TracePanel.PanelId\n" +
+                    "  JOIN RefDesignator ON RefDesignator.Id = Placement.RefDesignatorId\n" +
+                    "  --JOIN Manufacturer ON Manufacturer.Id = PackagingUnit.ManufacturerId\n" +
+                    "  --JOIN Supplier ON PackagingUnit.SupplierId = Supplier.Id\n" +
+                    "  JOIN TraceJob ON TraceJob.TraceDataId = TraceData.Id\n" +
+                    "  JOIN Job ON Job.Id = TraceJob.JobId\n" +
+                    "  JOIN [Order] ON [Order].Id = Job.OrderId" +
+                    "\n" +
+                    " \n" +
+                    "  where " + colMapping.get(selectedValue) + " = ?\n" +
+                    "  ORDER BY\n" +
+                    "  component ASC,\n" +
+                    "  Panel_Name ASC,\n" +
+                    "  Board_Barcode ASC;";
         }
+    }
 
 
 //        FilteredList<Data> filteredData = new FilteredList<>(data, p -> true);
@@ -394,7 +450,7 @@ public class HelloController {
 //        } else {
 //            myTableView.setItems(data);
 //        }
-    }
+
     @FXML
     void btnResetClicked(ActionEvent event) {
         searchText.clear();

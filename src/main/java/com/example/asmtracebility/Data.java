@@ -46,6 +46,23 @@ public class Data {
 
     }
 
+    public Data(String panelBarcode, String boardBarcode){
+        this.panelBarcode = new SimpleStringProperty(panelBarcode);
+        this.boardBarcode = new SimpleStringProperty(boardBarcode);
+        this.component = new SimpleStringProperty("");
+        this.panelName = new SimpleStringProperty("");
+        this.refDesignator = new SimpleStringProperty("");
+        this.componentBarcode = new SimpleStringProperty("");
+        this.batch = new SimpleStringProperty("");
+        this.originalQuanity = new SimpleStringProperty("");
+        this.packagingUid = new SimpleStringProperty("");
+        this.manufactureDate = new SimpleStringProperty("");
+        this.msdLevel = new SimpleStringProperty("");
+        this.serial = new SimpleStringProperty("");
+        //this.supplier = new SimpleStringProperty(supplier);
+        this.expireDate = new SimpleStringProperty("");
+    }
+
     public String getComponent(){
         return component.get();
     }
