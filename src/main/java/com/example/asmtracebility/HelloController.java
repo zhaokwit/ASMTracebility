@@ -87,7 +87,7 @@ public class HelloController {
     private TextField searchText;
 
     ObservableList<Data> data = FXCollections.observableArrayList();
-    List<String> searchOptions = Arrays.asList("Component", "PanelBarcode", "ShopOrder", "PanelName", "BoardBarcode", "RefDesignator", "ComponentBarcode", "Batch", "OriginalQuantity", "PackagingUID", "ManufactureDate", "MSDLevel", " Serial", "ExpiryDate" );
+    List<String> searchOptions = Arrays.asList("Component", "PanelBarcode", "ShopOrder", "Station", "PanelName", "BoardBarcode", "RefDesignator", "ComponentBarcode", "Batch", "OriginalQuantity", "PackagingUID", "ManufactureDate", "MSDLevel", " Serial", "ExpiryDate" );
     @FXML
     private ChoiceBox<String> myChoiceBox;
 
@@ -101,7 +101,7 @@ public class HelloController {
         colShopOrder.setCellValueFactory(new PropertyValueFactory<>("Shop_Order"));
         colPanelName.setCellValueFactory(new PropertyValueFactory<>("Panel_Name"));
         colBoardBarcode.setCellValueFactory(new PropertyValueFactory<>("Board_Barcode"));
-//        colStation.setCellValueFactory(new PropertyValueFactory<>("Station"));
+        colStation.setCellValueFactory(new PropertyValueFactory<>("Station"));
 //        colMatrixIndexX.setCellValueFactory(new PropertyValueFactory<>("Matrix_Index_X"));
 //        colMatrixIndexY.setCellValueFactory(new PropertyValueFactory<>("Matrix_Index_Y"));
         colRefDesignator.setCellValueFactory(new PropertyValueFactory<>("Ref_Designator"));
@@ -141,7 +141,7 @@ public class HelloController {
             if (selectedValue.equals("ShopOrder")) {
                 statement.setString(1,searchTextValue);
                 // Remove the unnecessary columns
-                myTableView.getColumns().removeAll(colComponent, colPanelBarcode, colShopOrder, colBoardBarcode, colPanelName, colRefDesignator, colComponentBarcode,
+                myTableView.getColumns().removeAll(colComponent, colPanelBarcode, colShopOrder, colBoardBarcode, colPanelName, colStation, colRefDesignator, colComponentBarcode,
                         colBatch, colOriginalQuanity, colPackagingUid, colManufactureDate, colSerial, colExpireDate,
                         colMsdLevel);
 
@@ -170,7 +170,7 @@ public class HelloController {
                 }
                 myTableView.setItems(data);
             }else {
-                myTableView.getColumns().setAll(colComponent, colPanelBarcode, colPanelName, colShopOrder, colBoardBarcode,
+                myTableView.getColumns().setAll(colComponent, colPanelBarcode, colPanelName, colStation, colShopOrder, colBoardBarcode,
                         colRefDesignator, colComponentBarcode, colBatch, colOriginalQuanity, colPackagingUid,
                         colManufactureDate, colMsdLevel, colSerial, colExpireDate);
 
@@ -181,7 +181,7 @@ public class HelloController {
                     String panelBarcode = resultSet.getString("Panel_Barcode");
                     String shopOrder = resultSet.getString("Shop_Order");
                     String panelName = resultSet.getString("Panel_Name");
-                    //String station = resultSet.getString("Station");
+                    String station = resultSet.getString("Station");
                     // String matrixIndexX = resultSet.getString("Matrix_Index_X");
                     //String matrixIndexY = resultSet.getString("Matrix_Index_Y");
                     String boardBarcode = resultSet.getString("Board_Barcode");
@@ -197,8 +197,9 @@ public class HelloController {
                     //String supplier = resultSet.getString("Supplier");
                     String expireDate = resultSet.getString("Expiry_Date");
 
+
                     dataFound = true;
-                    data.add(new Data(component, panelBarcode, shopOrder, panelName, boardBarcode, refDesignator, componentBarcode, batch, originalQuanity, packagingUid, manufactureDate, msdLevel, serial, expireDate));
+                    data.add(new Data(component, panelBarcode, shopOrder, panelName, station, boardBarcode, refDesignator, componentBarcode, batch, originalQuanity, packagingUid, manufactureDate, msdLevel, serial, expireDate));
 
                 }
                 processData();
@@ -278,6 +279,7 @@ public class HelloController {
         colMapping.put("Serial", "PackagingUnit.Serial");
         colMapping.put("ExipryDate", "PackagingUnit.ExpiryDate");
         colMapping.put("ShopOrder", "[Order].Name");
+        colMapping.put("Station", "Station.Name");
 
         if (selectedValue.equals("ShopOrder")) {
             return "SELECT DISTINCT\n" +
@@ -308,6 +310,7 @@ public class HelloController {
                     "  PCBBarcode.Barcode AS Panel_Barcode,\n" +
                     "  [Order].Name AS ShopOrder,\n" +
                     "  Panel.Name AS Panel_Name,\n" +
+                    "  Station.Name AS Station,\n" +
                     "  TracePanel.Barcode AS Board_Barcode,\n" +
                     "  RefDesignator.Name AS RefDesignator,\n" +
                     "  [Order].Name AS Shop_Order,\n" +
@@ -333,6 +336,7 @@ public class HelloController {
                     "  JOIN Job ON Job.Id = TraceJob.JobId\n" +
                     "  JOIN [Order] ON [Order].Id = Job.OrderId\n" +
                     "  JOIN PlacementGroup ON PlacementGroup.Id = Placement.PlacementGroupId\n" +
+                    "  JOIN Station ON Station.Id = TraceData.StationId\n" +
                     "WHERE\n" +
                     " PlacementGroup.Id IN (\n" +
                     "    SELECT PlacementGroupId FROM TracePlacement WHERE TraceDataId = TraceData.Id\n" +
@@ -344,172 +348,6 @@ public class HelloController {
                     "  Board_Barcode ASC;\n";
         }
     }
-
-
-//        FilteredList<Data> filteredData = new FilteredList<>(data, p -> true);
-//        if (!searchTextValue.isEmpty()) {
-//            switch (selectedValue) {
-//                case "Component":
-//                    filteredData.setPredicate(p -> {
-//                        String component = p.getComponent();
-//                        if (component == null) {
-//                            return false;
-//                        }
-//                        return component.contains(searchTextValue);
-//                    });
-//                    break;
-//                case "PanelName":
-//                    filteredData.setPredicate(p -> {
-//                        String panelName = p.getPanel_Name();
-//                        if (panelName == null) {
-//                            return false;
-//                        }
-//                        return panelName.contains(searchTextValue);
-//                    });
-//                    break;
-//                case "BoardBarcode":
-//                    filteredData.setPredicate(p -> {
-//                        String boardBarcode = p.getBoard_Barcode();
-//                        if (boardBarcode == null) {
-//                            return false;
-//                        }
-//                        return boardBarcode.contains(searchTextValue);
-//                    });
-//                    break;
-//                case "Station":
-//                    filteredData.setPredicate(p -> {
-//                        String station = p.getStation();
-//                        if (station == null) {
-//                            return false;
-//                        }
-//                        return station.contains(searchTextValue);
-//                    });
-//                    break;
-//                case "MatrixIndexX":
-//                    filteredData.setPredicate(p -> {
-//                        String matrixIndexX = p.getMatrix_Index_X();
-//                        if (matrixIndexX == null) {
-//                            return false;
-//                        }
-//                        return matrixIndexX.contains(searchTextValue);
-//                    });
-//                    break;
-//                case "MatrixIndexY":
-//                    filteredData.setPredicate(p -> {
-//                        String matrixIndexY = p.getMatrix_Index_Y();
-//                        if (matrixIndexY == null) {
-//                            return false;
-//                        }
-//                        return matrixIndexY.contains(searchTextValue);
-//                    });
-//                    break;
-//                case "RefDesignator":
-//                    filteredData.setPredicate(p -> {
-//                        String refDesignator = p.getRef_Designator();
-//                        if (refDesignator == null) {
-//                            return false;
-//                        }
-//                        return refDesignator.contains(searchTextValue);
-//                    });
-//                    break;
-//                case "ComponentBarcode":
-//                    filteredData.setPredicate(p -> {
-//                        String componentBarcode = p.getComponent_Barcode();
-//                        if (componentBarcode == null) {
-//                            return false;
-//                        }
-//                        return componentBarcode.contains(searchTextValue);
-//                    });
-//                    break;
-//                case "Batch":
-//                    filteredData.setPredicate(p -> {
-//                        String batch = p.getBatch();
-//                        if (batch == null) {
-//                            return false;
-//                        }
-//                        return batch.contains(searchTextValue);
-//                    });
-//                    break;
-//                case "OriginalQuanity":
-//                    filteredData.setPredicate(p -> {
-//                        String originalQuanity = p.getOriginal_Quanity();
-//                        if (originalQuanity == null) {
-//                            return false;
-//                        }
-//                        return originalQuanity.contains(searchTextValue);
-//                    });
-//                    break;
-//                case "PackagingUID":
-//                    filteredData.setPredicate(p -> {
-//                        String packagingUid = p.getPackaging_UID();
-//                        if (packagingUid == null) {
-//                            return false;
-//                        }
-//                        return packagingUid.contains(searchTextValue);
-//                    });
-//                    break;
-//                case "ManufactureDate":
-//                    filteredData.setPredicate(p -> {
-//                        String manufactureDate = p.getManufacture_Date();
-//                        if (manufactureDate == null) {
-//                            return false;
-//                        }
-//                        return manufactureDate.contains(searchTextValue);
-//                    });
-//                    break;
-//                case "Manufacturer":
-//                    filteredData.setPredicate(p -> {
-//                        String manufacturer = p.getManufacturer();
-//                        if (manufacturer == null) {
-//                            return false;
-//                        }
-//                        return manufacturer.contains(searchTextValue);
-//                    });
-//                    break;
-//                case "MSDLevel":
-//                    filteredData.setPredicate(p -> {
-//                        String msdLevel = p.getMSD_Level();
-//                        if (msdLevel == null) {
-//                            return false;
-//                        }
-//                        return msdLevel.contains(searchTextValue);
-//                    });
-//                    break;
-//                case "Serial":
-//                    filteredData.setPredicate(p -> {
-//                        String serial = p.getSerial();
-//                        if (serial == null) {
-//                            return false;
-//                        }
-//                        return serial.contains(searchTextValue);
-//                    });
-//                    break;
-//                case "Supplier":
-//                    filteredData.setPredicate(p -> {
-//                        String supplier = p.getSupplier();
-//                        if (supplier == null) {
-//                            return false;
-//                        }
-//                        return supplier.contains(searchTextValue);
-//                    });
-//                    break;
-//                case "ExpireDate":
-//                    filteredData.setPredicate(p -> {
-//                        String expireDate = p.getExpire_Date();
-//                        if (expireDate == null) {
-//                            return false;
-//                        }
-//                        return expireDate.contains(searchTextValue);
-//                    });
-//                    break;
-//                default:
-//                    filteredData.setPredicate(p -> true);
-//                    break;
-//            }
-//            myTableView.setItems(filteredData);
-//        } else {
-//            myTableView.setItems(data);
-//        }
 
     @FXML
     void btnResetClicked(ActionEvent event) {

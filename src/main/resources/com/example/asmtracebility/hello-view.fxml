@@ -32,6 +32,7 @@
                   <TableColumn fx:id="colPanelBarcode" minWidth="0.0" prefWidth="123.0" text="Panel_Barcode" />
                   <TableColumn fx:id="colShopOrder" prefWidth="75.0" text="Shop_Order" />
                 <TableColumn fx:id="colPanelName" minWidth="0.0" prefWidth="123.0" text="Panel_Name" />
+                  <TableColumn fx:id="colStation" prefWidth="75.0" text="Station" />
                   <TableColumn fx:id="colBoardBarcode" prefWidth="109.0" text="Board_Barcode" />
                   <TableColumn fx:id="colRefDesignator" prefWidth="95.0" text="Ref_Designator" />
                   <TableColumn fx:id="colComponentBarcode" prefWidth="141.0" text="Component_Barcode" />

@@ -9,7 +9,7 @@ public class Data {
     private final SimpleStringProperty shopOrder;
     private final SimpleStringProperty panelName;
     private final SimpleStringProperty boardBarcode;
-    //private final SimpleStringProperty station;
+    private final SimpleStringProperty station;
    // private final SimpleStringProperty matrixIndexX;
     //private final SimpleStringProperty matrixIndexY;
     private final SimpleStringProperty refDesignator;
@@ -25,13 +25,13 @@ public class Data {
     private final SimpleStringProperty expireDate;
 
 
-    public Data(String component, String panelBarcode, String shopOrder, String panelName, String boardBarcode, String refDesignator, String componentBarcode, String batch, String originalQuanity, String packagingUid, String manufactureDate, String msdLevel, String serial, String expireDate) {
+    public Data(String component, String panelBarcode, String shopOrder, String panelName, String station, String boardBarcode, String refDesignator, String componentBarcode, String batch, String originalQuanity, String packagingUid, String manufactureDate, String msdLevel, String serial, String expireDate) {
         this.component = new SimpleStringProperty(component);
         this.panelBarcode = new SimpleStringProperty(panelBarcode);
         this.shopOrder = new SimpleStringProperty(shopOrder);
         this.panelName = new SimpleStringProperty(panelName);
         this.boardBarcode = new SimpleStringProperty(boardBarcode);
-        //this.station = new SimpleStringProperty(station);
+        this.station = new SimpleStringProperty(station);
         //this.matrixIndexX = new SimpleStringProperty(matrixIndexX);
         //this.matrixIndexY = new SimpleStringProperty(matrixIndexY);
         this.refDesignator = new SimpleStringProperty(refDesignator);
@@ -54,6 +54,7 @@ public class Data {
         this.shopOrder = new SimpleStringProperty("");
         this.component = new SimpleStringProperty("");
         this.panelName = new SimpleStringProperty("");
+        this.station = new SimpleStringProperty("");
         this.refDesignator = new SimpleStringProperty("");
         this.componentBarcode = new SimpleStringProperty("");
         this.batch = new SimpleStringProperty("");
@@ -76,9 +77,11 @@ public class Data {
     public String getShop_Order(){
         return shopOrder.get();
     }
-
     public String getPanel_Name(){
         return panelName.get();
+    }
+    public String getStation(){
+        return station.get();
     }
     public String getBoard_Barcode(){
         return boardBarcode.get();
