@@ -282,33 +282,37 @@ public class HelloController {
                     "  PCBBarcode\n" +
                     "  JOIN TraceData ON TraceData.PCBBarcodeId = PCBBarcode.Id\n" +
                     "  JOIN TracePanel ON TracePanel.TraceDataId = TraceData.Id\n" +
+                    "  JOIN Placement ON Placement.PanelId = TracePanel.PanelId\n" +
+                    "  JOIN Charge ON Charge.Id = Placement.ChargeId\n" +
+                    "  JOIN PackagingUnit ON PackagingUnit.Id = Charge.PackagingUnitId\n" +
+                    "  JOIN ComponentType ON ComponentType.Id = PackagingUnit.ComponentTypeId\n" +
                     "  JOIN Panel ON Panel.Id = TracePanel.PanelId\n" +
+                    "  JOIN RefDesignator ON RefDesignator.Id = Placement.RefDesignatorId\n" +
                     "  JOIN TraceJob ON TraceJob.TraceDataId = TraceData.Id\n" +
                     "  JOIN Job ON Job.Id = TraceJob.JobId\n" +
                     "  JOIN [Order] ON [Order].Id = Job.OrderId\n" +
+                    "  JOIN PlacementGroup ON PlacementGroup.Id = Placement.PlacementGroupId\n" +
                     "WHERE\n" +
                     "[Order].Name" + " = ?\n" +
                     "AND TracePanel.Barcode <> ''\n"+
                     "Order BY\n" +
                     "Board_Barcode ASC;";
         } else {
-            return "SELECT DISTINCT\n" +
+            return "SELECT\n" +
                     "  ComponentType.TypeName AS Component,\n" +
                     "  PCBBarcode.Barcode AS Panel_Barcode,\n" +
                     "  Panel.Name AS Panel_Name,\n" +
                     "  TracePanel.Barcode AS Board_Barcode,\n" +
                     "  RefDesignator.Name AS RefDesignator,\n" +
+                    "  [Order].Name AS Shop_Order,\n" +
                     "  PackagingUnit.ComponentBarcode AS Component_Barcode,\n" +
-                    "  PackagingUnit.Batch As Batch,\n" +
+                    "  PackagingUnit.Batch AS Batch,\n" +
                     "  PackagingUnit.OriginalQuantity AS Original_Quantity,\n" +
                     "  PackagingUnit.PackagingUniqueId,\n" +
-                    "  PackagingUnit.ManufactureDate as Manufacture_Date,\n" +
+                    "  PackagingUnit.ManufactureDate AS Manufacture_Date,\n" +
                     "  PackagingUnit.MsdLevel,\n" +
                     "  PackagingUnit.Serial,\n" +
-                    "  --Manufacturer.Name AS Manufacturer\n" +
-                    "  --Supplier.Name AS Supplier,\n" +
-                    "  PackagingUnit.ExpiryDate as Expiry_Date\n" +
-                    "\n" +
+                    "  PackagingUnit.ExpiryDate AS Expiry_Date\n" +
                     "FROM\n" +
                     "  PCBBarcode\n" +
                     "  JOIN TraceData ON TraceData.PCBBarcodeId = PCBBarcode.Id\n" +
@@ -319,18 +323,19 @@ public class HelloController {
                     "  JOIN ComponentType ON ComponentType.Id = PackagingUnit.ComponentTypeId\n" +
                     "  JOIN Panel ON Panel.Id = TracePanel.PanelId\n" +
                     "  JOIN RefDesignator ON RefDesignator.Id = Placement.RefDesignatorId\n" +
-                    "  --JOIN Manufacturer ON Manufacturer.Id = PackagingUnit.ManufacturerId\n" +
-                    "  --JOIN Supplier ON PackagingUnit.SupplierId = Supplier.Id\n" +
                     "  JOIN TraceJob ON TraceJob.TraceDataId = TraceData.Id\n" +
                     "  JOIN Job ON Job.Id = TraceJob.JobId\n" +
-                    "  JOIN [Order] ON [Order].Id = Job.OrderId" +
-                    "\n" +
-                    " \n" +
-                    "  where " + colMapping.get(selectedValue) + " = ?\n" +
-                    "  ORDER BY\n" +
-                    "  component ASC,\n" +
+                    "  JOIN [Order] ON [Order].Id = Job.OrderId\n" +
+                    "  JOIN PlacementGroup ON PlacementGroup.Id = Placement.PlacementGroupId\n" +
+                    "WHERE\n" +
+                    " PlacementGroup.Id IN (\n" +
+                    "    SELECT PlacementGroupId FROM TracePlacement WHERE TraceDataId = TraceData.Id\n" +
+                    "  )\n" + "AND " +
+                    colMapping.get(selectedValue) + " = ?\n" +
+                    "ORDER BY\n" +
+                    "  Component ASC,\n" +
                     "  Panel_Name ASC,\n" +
-                    "  Board_Barcode ASC;";
+                    "  Board_Barcode ASC;\n";
         }
     }
 
