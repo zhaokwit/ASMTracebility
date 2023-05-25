@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleStringProperty;
 public class Data {
     private final SimpleStringProperty component;
     private  final SimpleStringProperty panelBarcode;
+    private final SimpleStringProperty shopOrder;
     private final SimpleStringProperty panelName;
     private final SimpleStringProperty boardBarcode;
     //private final SimpleStringProperty station;
@@ -24,9 +25,10 @@ public class Data {
     private final SimpleStringProperty expireDate;
 
 
-    public Data(String component, String panelBarcode, String panelName, String boardBarcode, String refDesignator, String componentBarcode, String batch, String originalQuanity, String packagingUid, String manufactureDate, String msdLevel, String serial, String expireDate) {
+    public Data(String component, String panelBarcode, String shopOrder, String panelName, String boardBarcode, String refDesignator, String componentBarcode, String batch, String originalQuanity, String packagingUid, String manufactureDate, String msdLevel, String serial, String expireDate) {
         this.component = new SimpleStringProperty(component);
         this.panelBarcode = new SimpleStringProperty(panelBarcode);
+        this.shopOrder = new SimpleStringProperty(shopOrder);
         this.panelName = new SimpleStringProperty(panelName);
         this.boardBarcode = new SimpleStringProperty(boardBarcode);
         //this.station = new SimpleStringProperty(station);
@@ -49,6 +51,7 @@ public class Data {
     public Data(String panelBarcode, String boardBarcode){
         this.panelBarcode = new SimpleStringProperty(panelBarcode);
         this.boardBarcode = new SimpleStringProperty(boardBarcode);
+        this.shopOrder = new SimpleStringProperty("");
         this.component = new SimpleStringProperty("");
         this.panelName = new SimpleStringProperty("");
         this.refDesignator = new SimpleStringProperty("");
@@ -68,6 +71,10 @@ public class Data {
     }
     public String getPanel_Barcode(){
         return panelBarcode.get();
+    }
+
+    public String getShop_Order(){
+        return shopOrder.get();
     }
 
     public String getPanel_Name(){

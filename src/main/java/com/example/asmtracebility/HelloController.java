@@ -45,6 +45,8 @@ public class HelloController {
     @FXML
     private TableColumn<Data, String> colComponent;
     @FXML
+    private TableColumn<Data, String> colShopOrder;
+    @FXML
     private TableColumn<Data, String> colPanelBarcode;
     @FXML
     private TableColumn<Data, String> colPanelName;
@@ -96,6 +98,7 @@ public class HelloController {
         myChoiceBox.setItems(FXCollections.observableArrayList(searchOptions));
         colComponent.setCellValueFactory(new PropertyValueFactory<>("Component"));
         colPanelBarcode.setCellValueFactory(new PropertyValueFactory<>("Panel_Barcode"));
+        colShopOrder.setCellValueFactory(new PropertyValueFactory<>("Shop_Order"));
         colPanelName.setCellValueFactory(new PropertyValueFactory<>("Panel_Name"));
         colBoardBarcode.setCellValueFactory(new PropertyValueFactory<>("Board_Barcode"));
 //        colStation.setCellValueFactory(new PropertyValueFactory<>("Station"));
@@ -138,7 +141,7 @@ public class HelloController {
             if (selectedValue.equals("ShopOrder")) {
                 statement.setString(1,searchTextValue);
                 // Remove the unnecessary columns
-                myTableView.getColumns().removeAll(colComponent, colPanelBarcode, colBoardBarcode, colPanelName, colRefDesignator, colComponentBarcode,
+                myTableView.getColumns().removeAll(colComponent, colPanelBarcode, colShopOrder, colBoardBarcode, colPanelName, colRefDesignator, colComponentBarcode,
                         colBatch, colOriginalQuanity, colPackagingUid, colManufactureDate, colSerial, colExpireDate,
                         colMsdLevel);
 
@@ -167,7 +170,7 @@ public class HelloController {
                 }
                 myTableView.setItems(data);
             }else {
-                myTableView.getColumns().setAll(colComponent, colPanelBarcode, colPanelName, colBoardBarcode,
+                myTableView.getColumns().setAll(colComponent, colPanelBarcode, colPanelName, colShopOrder, colBoardBarcode,
                         colRefDesignator, colComponentBarcode, colBatch, colOriginalQuanity, colPackagingUid,
                         colManufactureDate, colMsdLevel, colSerial, colExpireDate);
 
@@ -176,6 +179,7 @@ public class HelloController {
                 while (resultSet.next()) {
                     String component = resultSet.getString("Component");
                     String panelBarcode = resultSet.getString("Panel_Barcode");
+                    String shopOrder = resultSet.getString("Shop_Order");
                     String panelName = resultSet.getString("Panel_Name");
                     //String station = resultSet.getString("Station");
                     // String matrixIndexX = resultSet.getString("Matrix_Index_X");
@@ -194,7 +198,7 @@ public class HelloController {
                     String expireDate = resultSet.getString("Expiry_Date");
 
                     dataFound = true;
-                    data.add(new Data(component, panelBarcode, panelName, boardBarcode, refDesignator, componentBarcode, batch, originalQuanity, packagingUid, manufactureDate, msdLevel, serial, expireDate));
+                    data.add(new Data(component, panelBarcode, shopOrder, panelName, boardBarcode, refDesignator, componentBarcode, batch, originalQuanity, packagingUid, manufactureDate, msdLevel, serial, expireDate));
 
                 }
                 processData();
@@ -273,6 +277,7 @@ public class HelloController {
         colMapping.put("MSDLevel", "PackagingUnit.MsdLevel");
         colMapping.put("Serial", "PackagingUnit.Serial");
         colMapping.put("ExipryDate", "PackagingUnit.ExpiryDate");
+        colMapping.put("ShopOrder", "[Order].Name");
 
         if (selectedValue.equals("ShopOrder")) {
             return "SELECT DISTINCT\n" +
@@ -301,6 +306,7 @@ public class HelloController {
             return "SELECT\n" +
                     "  ComponentType.TypeName AS Component,\n" +
                     "  PCBBarcode.Barcode AS Panel_Barcode,\n" +
+                    "  [Order].Name AS ShopOrder,\n" +
                     "  Panel.Name AS Panel_Name,\n" +
                     "  TracePanel.Barcode AS Board_Barcode,\n" +
                     "  RefDesignator.Name AS RefDesignator,\n" +
