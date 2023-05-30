@@ -28,21 +28,27 @@
          <content>
             <TableView fx:id="myTableView" prefHeight="544.0" prefWidth="5000.0">
               <columns>
-                <TableColumn fx:id="colComponent" prefWidth="119.0" text="Component" />
-                  <TableColumn fx:id="colPanelBarcode" minWidth="0.0" prefWidth="123.0" text="Panel_Barcode" />
-                  <TableColumn fx:id="colShopOrder" prefWidth="75.0" text="Shop_Order" />
-                <TableColumn fx:id="colPanelName" minWidth="0.0" prefWidth="123.0" text="Panel_Name" />
+                  <TableColumn fx:id="colPanelId" prefWidth="119.0" text="Panel_ID" />
+                  <TableColumn fx:id="colPcbId" minWidth="0.0" prefWidth="123.0" text="PCB_ID" />
+                  <TableColumn fx:id="colPanelName" prefWidth="75.0" text="Panel_Name" />
+                  <TableColumn fx:id="colShopOrder" minWidth="0.0" prefWidth="123.0" text="Shop_Order" />
+                  <TableColumn fx:id="colComponentPN" prefWidth="106.0" text="Component_PN" />
+                  <TableColumn fx:id="colRefDesignator" prefWidth="110.0" text="RefDesignator" />
+                  <TableColumn fx:id="colReelId" prefWidth="63.0" text="Reel_ID" />
+                  <TableColumn fx:id="colTableId" prefWidth="141.0" text="Table_ID" />
+                  <TableColumn fx:id="colTrack" prefWidth="52.0" text="Track" />
+                  <TableColumn fx:id="colDiv" minWidth="4.0" prefWidth="113.0" text="Div" />
+                  <TableColumn fx:id="colTower" minWidth="0.0" prefWidth="97.0" text="Tower" />
+                  <TableColumn fx:id="colLevel" minWidth="0.0" prefWidth="137.0" text="Level" />
+                  <TableColumn fx:id="colOriginalQuantity" minWidth="0.0" prefWidth="97.0" text="Original_Quantity" />
+                  <TableColumn fx:id="colLotCode" minWidth="0.0" prefWidth="62.0" text="Lot_Code" />
+                  <TableColumn fx:id="colDateCode" minWidth="0.0" prefWidth="131.0" text="Date_Code" />
+                  <TableColumn fx:id="colSupplier" prefWidth="75.0" text="Supplier" />
                   <TableColumn fx:id="colStation" prefWidth="75.0" text="Station" />
-                  <TableColumn fx:id="colBoardBarcode" prefWidth="109.0" text="Board_Barcode" />
-                  <TableColumn fx:id="colRefDesignator" prefWidth="95.0" text="Ref_Designator" />
-                  <TableColumn fx:id="colComponentBarcode" prefWidth="141.0" text="Component_Barcode" />
-                  <TableColumn fx:id="colBatch" prefWidth="52.0" text="Batch" />
-                  <TableColumn fx:id="colOriginalQuanity" minWidth="4.0" prefWidth="113.0" text="Original_Quanity" />
-                  <TableColumn fx:id="colPackagingUid" minWidth="0.0" prefWidth="97.0" text="Packaging_UID" />
-                  <TableColumn fx:id="colManufactureDate" minWidth="0.0" prefWidth="137.0" text="Manufacture_Date" />
-                  <TableColumn fx:id="colMsdLevel" minWidth="0.0" prefWidth="100.0" text="MSD_Level" />
-                  <TableColumn fx:id="colSerial" minWidth="0.0" prefWidth="59.0" text="Serial" />
-                  <TableColumn fx:id="colExpireDate" minWidth="0.0" prefWidth="131.0" text="Exipre_Date" />
+                  <TableColumn fx:id="colMsdLevel" prefWidth="75.0" text="Msd_Level" />
+                  <TableColumn fx:id="colProgram" prefWidth="75.0" text="Program" />
+                  <TableColumn fx:id="colBeginDate" prefWidth="75.0" text="Begin_Date" />
+                  <TableColumn fx:id="colEndDate" prefWidth="75.0" text="End_Date" />
               </columns>
             </TableView>
          </content>

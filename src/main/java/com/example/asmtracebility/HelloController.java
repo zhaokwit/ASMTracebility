@@ -43,78 +43,105 @@ public class HelloController {
     @FXML
     private TableView<Data> myTableView;
     @FXML
-    private TableColumn<Data, String> colComponent;
+    private TableColumn<Data, String> colPanelId;
     @FXML
-    private TableColumn<Data, String> colShopOrder;
-    @FXML
-    private TableColumn<Data, String> colPanelBarcode;
+    private TableColumn<Data, String> colPcbId;
     @FXML
     private TableColumn<Data, String> colPanelName;
     @FXML
-    private TableColumn<Data, String> colBoardBarcode;
+    private TableColumn<Data, String> colShopOrder;
     @FXML
-    private TableColumn<Data, String> colStation;
-    @FXML
-    private TableColumn<Data, String> colMatrixIndexX;
-    @FXML
-    private TableColumn<Data, String> colMatrixIndexY;
+    private TableColumn<Data, String> colComponentPN;
     @FXML
     private TableColumn<Data, String> colRefDesignator;
     @FXML
-    private TableColumn<Data, String> colComponentBarcode;
+    private TableColumn<Data, String> colReelId;
     @FXML
-    private TableColumn<Data, String> colBatch;
+    private TableColumn<Data, String> colTableId;
     @FXML
-    private TableColumn<Data, String> colOriginalQuanity;
+    private TableColumn<Data, String> colTrack;
     @FXML
-    private TableColumn<Data, String> colPackagingUid;
+    private TableColumn<Data, String> colDiv;
     @FXML
-    private TableColumn<Data, String> colManufactureDate;
+    private TableColumn<Data, String> colTower;
     @FXML
-    private TableColumn<Data, String> colManufacturer;
+    private TableColumn<Data, String> colLevel;
     @FXML
-    private TableColumn<Data, String> colMsdLevel;
+    private TableColumn<Data, String> colOriginalQuantity;
     @FXML
-    private TableColumn<Data, String> colSerial;
+    private TableColumn<Data, String> colLotCode;
+    @FXML
+    private TableColumn<Data, String> colDateCode;
     @FXML
     private TableColumn<Data, String> colSupplier;
     @FXML
-    private TableColumn<Data, String> colExpireDate;
-
-
+    private TableColumn<Data, String> colStation;
+    @FXML
+    private TableColumn<Data, String> colMsdLevel;
+    @FXML
+    private TableColumn<Data, String> colProgram;
+    @FXML
+    private TableColumn<Data, String> colBeginDate;
+    @FXML
+    private TableColumn<Data, String> colEndDate;
 
     @FXML
     private TextField searchText;
 
     ObservableList<Data> data = FXCollections.observableArrayList();
-    List<String> searchOptions = Arrays.asList("Component", "PanelBarcode", "ShopOrder", "Station", "PanelName", "BoardBarcode", "RefDesignator", "ComponentBarcode", "Batch", "OriginalQuantity", "PackagingUID", "ManufactureDate", "MSDLevel", " Serial", "ExpiryDate" );
+    List<String> searchOptions = Arrays.asList(
+            "panelId",
+            "pcbId",
+            "panelName",
+            "shopOrder",
+            "componentPN",
+            "refDesignator",
+            "reelId",
+            "tableId",
+            "track",
+            "div",
+            "tower",
+            "level",
+            "originalQuantity",
+            "lotCode",
+            "dateCode",
+            "supplier",
+            "station",
+            "msdLevel",
+            "program",
+            "beginDate",
+            "endDate"
+    );
+
     @FXML
     private ChoiceBox<String> myChoiceBox;
 
     @FXML
     private void initialize(){
         borderPane.setCenter(myAnchorPane);
-        myChoiceBox.setValue("Component");
+        myChoiceBox.setValue("pcbId");
         myChoiceBox.setItems(FXCollections.observableArrayList(searchOptions));
-        colComponent.setCellValueFactory(new PropertyValueFactory<>("Component"));
-        colPanelBarcode.setCellValueFactory(new PropertyValueFactory<>("Panel_Barcode"));
-        colShopOrder.setCellValueFactory(new PropertyValueFactory<>("Shop_Order"));
-        colPanelName.setCellValueFactory(new PropertyValueFactory<>("Panel_Name"));
-        colBoardBarcode.setCellValueFactory(new PropertyValueFactory<>("Board_Barcode"));
-        colStation.setCellValueFactory(new PropertyValueFactory<>("Station"));
-//        colMatrixIndexX.setCellValueFactory(new PropertyValueFactory<>("Matrix_Index_X"));
-//        colMatrixIndexY.setCellValueFactory(new PropertyValueFactory<>("Matrix_Index_Y"));
-        colRefDesignator.setCellValueFactory(new PropertyValueFactory<>("Ref_Designator"));
-        colComponentBarcode.setCellValueFactory(new PropertyValueFactory<>("Component_Barcode"));
-        colBatch.setCellValueFactory(new PropertyValueFactory<>("Batch"));
-        colOriginalQuanity.setCellValueFactory(new PropertyValueFactory<>("Original_Quanity"));
-        colPackagingUid.setCellValueFactory(new PropertyValueFactory<>("Packaging_UID"));
-        colManufactureDate.setCellValueFactory(new PropertyValueFactory<>("Manufacture_Date"));
-//        colManufacturer.setCellValueFactory(new PropertyValueFactory<>("Manufacturer"));
-        colMsdLevel.setCellValueFactory(new PropertyValueFactory<>("MSD_Level"));
-        colSerial.setCellValueFactory(new PropertyValueFactory<>("Serial"));
-//        colSupplier.setCellValueFactory(new PropertyValueFactory<>("Supplier"));
-        colExpireDate.setCellValueFactory(new PropertyValueFactory<>("Expire_Date"));
+        colPanelId.setCellValueFactory(new PropertyValueFactory<>("panelId"));
+        colPcbId.setCellValueFactory(new PropertyValueFactory<>("pcbId"));
+        colPanelName.setCellValueFactory(new PropertyValueFactory<>("panelName"));
+        colShopOrder.setCellValueFactory(new PropertyValueFactory<>("shopOrder"));
+        colComponentPN.setCellValueFactory(new PropertyValueFactory<>("componentPN"));
+        colRefDesignator.setCellValueFactory(new PropertyValueFactory<>("refDesignator"));
+        colReelId.setCellValueFactory(new PropertyValueFactory<>("reelId"));
+        colTableId.setCellValueFactory(new PropertyValueFactory<>("tableId"));
+        colTrack.setCellValueFactory(new PropertyValueFactory<>("track"));
+        colDiv.setCellValueFactory(new PropertyValueFactory<>("div"));
+        colTower.setCellValueFactory(new PropertyValueFactory<>("tower"));
+        colLevel.setCellValueFactory(new PropertyValueFactory<>("level"));
+        colOriginalQuantity.setCellValueFactory(new PropertyValueFactory<>("originalQuantity"));
+        colLotCode.setCellValueFactory(new PropertyValueFactory<>("lotCode"));
+        colDateCode.setCellValueFactory(new PropertyValueFactory<>("dateCode"));
+        colSupplier.setCellValueFactory(new PropertyValueFactory<>("supplier"));
+        colStation.setCellValueFactory(new PropertyValueFactory<>("station"));
+        colMsdLevel.setCellValueFactory(new PropertyValueFactory<>("msdLevel"));
+        colProgram.setCellValueFactory(new PropertyValueFactory<>("program"));
+        colBeginDate.setCellValueFactory(new PropertyValueFactory<>("beginDate"));
+        colEndDate.setCellValueFactory(new PropertyValueFactory<>("endDate"));
 
     }
 
@@ -141,23 +168,21 @@ public class HelloController {
             if (selectedValue.equals("ShopOrder")) {
                 statement.setString(1,searchTextValue);
                 // Remove the unnecessary columns
-                myTableView.getColumns().removeAll(colComponent, colPanelBarcode, colShopOrder, colBoardBarcode, colPanelName, colStation, colRefDesignator, colComponentBarcode,
-                        colBatch, colOriginalQuanity, colPackagingUid, colManufactureDate, colSerial, colExpireDate,
-                        colMsdLevel);
+                myTableView.getColumns().removeAll(colPanelId, colPcbId, colPanelName, colShopOrder, colComponentPN, colRefDesignator,
+                        colReelId, colTableId, colTrack, colDiv, colTower, colLevel, colOriginalQuantity, colLotCode,
+                        colDateCode, colSupplier, colStation, colMsdLevel, colProgram, colBeginDate, colEndDate);
 
                 // Add the necessary columns
-                myTableView.getColumns().addAll(colPanelBarcode, colBoardBarcode);
+                myTableView.getColumns().addAll(colPanelId, colPcbId);
 
                 ResultSet resultSet = statement.executeQuery();
 
-                //ObservableList<Data> dataList = FXCollections.observableArrayList();
                 while (resultSet.next()) {
-                    //String shopOrder = resultSet.getString("ShopOrder");
-                    String panelBarcode = resultSet.getString("Panel_Barcode");
-                    String boardBarcode = resultSet.getString("Board_Barcode");
+                    String panelId = resultSet.getString("Panel_ID");
+                    String pcbId = resultSet.getString("PCB_ID");
 
                    // ShopOrderData shopOrderData = new ShopOrderData(panelBarcode, boardBarcode);
-                   data.add(new Data(panelBarcode, boardBarcode));
+                   data.add(new Data(panelId, pcbId));
 
                     dataFound = true;
                 }
@@ -170,36 +195,39 @@ public class HelloController {
                 }
                 myTableView.setItems(data);
             }else {
-                myTableView.getColumns().setAll(colComponent, colPanelBarcode, colPanelName, colStation, colShopOrder, colBoardBarcode,
-                        colRefDesignator, colComponentBarcode, colBatch, colOriginalQuanity, colPackagingUid,
-                        colManufactureDate, colMsdLevel, colSerial, colExpireDate);
+                myTableView.getColumns().setAll(colPanelId, colPcbId, colPanelName, colShopOrder, colComponentPN, colRefDesignator,
+                        colReelId, colTableId, colTrack, colDiv, colTower, colLevel, colOriginalQuantity, colLotCode,
+                        colDateCode, colSupplier, colStation, colMsdLevel, colProgram, colBeginDate, colEndDate);
 
                 statement.setString(1,searchTextValue);
                 ResultSet resultSet = statement.executeQuery();
                 while (resultSet.next()) {
-                    String component = resultSet.getString("Component");
-                    String panelBarcode = resultSet.getString("Panel_Barcode");
-                    String shopOrder = resultSet.getString("Shop_Order");
+                    String panelId = resultSet.getString("Panel_ID");
+                    String pcbId = resultSet.getString("PCB_ID");
                     String panelName = resultSet.getString("Panel_Name");
+                    String shopOrder = resultSet.getString("Shop_Order");
+                    String componentPN = resultSet.getString("component_PN");
+                    String refDesignator = resultSet.getString("refDesignator");
+                    String reelId = resultSet.getString("Reel_ID");
+                    String tableId = resultSet.getString("Table_ID");
+                    String track = resultSet.getString("Track");
+                    String div = resultSet.getString("Div");
+                    String tower = resultSet.getString("Tower");
+                    String level = resultSet.getString("Level");
+                    String originalQuantity = resultSet.getString("Original_Quantity");
+                    String lotCode = resultSet.getString("Lot_Code");
+                    String dateCode = resultSet.getString("Date_Code");
+                    String supplier = resultSet.getString("Supplier");
                     String station = resultSet.getString("Station");
-                    // String matrixIndexX = resultSet.getString("Matrix_Index_X");
-                    //String matrixIndexY = resultSet.getString("Matrix_Index_Y");
-                    String boardBarcode = resultSet.getString("Board_Barcode");
-                    String refDesignator = resultSet.getString("RefDesignator");
-                    String componentBarcode = resultSet.getString("Component_Barcode");
-                    String batch = resultSet.getString("Batch");
-                    String originalQuanity = resultSet.getString("Original_Quantity");
-                    String packagingUid = resultSet.getString("PackagingUniqueId");
-                    String manufactureDate = resultSet.getString("Manufacture_Date");
-                    //String manufacturer = resultSet.getString("Manufacturer");
-                    String msdLevel = resultSet.getString("MSDLevel");
-                    String serial = resultSet.getString("Serial");
-                    //String supplier = resultSet.getString("Supplier");
-                    String expireDate = resultSet.getString("Expiry_Date");
+                    String msdLevel = resultSet.getString("Msd_Level");
+                    String program = resultSet.getString("Program");
+                    String beginDate = resultSet.getString("Begin_Date");
+                    String endDate = resultSet.getString("End_Date");
+
 
 
                     dataFound = true;
-                    data.add(new Data(component, panelBarcode, shopOrder, panelName, station, boardBarcode, refDesignator, componentBarcode, batch, originalQuanity, packagingUid, manufactureDate, msdLevel, serial, expireDate));
+                    data.add(new Data(panelId, pcbId, panelName, shopOrder, componentPN, refDesignator, reelId, tableId, track, div, tower, level, originalQuantity, lotCode, dateCode, supplier, station, msdLevel, program, beginDate, endDate));
 
                 }
                 processData();
@@ -220,16 +248,16 @@ public class HelloController {
     public void processData(){
         for (Data topData : data) {
             // Check if the boardbarcode is empty
-            if (topData.getBoard_Barcode().isEmpty()) {
-                String panelBarcode = topData.getPanel_Barcode();
-                String topPanelName = topData.getPanel_Name();
+            if (topData.getPcbId().isEmpty()) {
+                String panelId = topData.getPanelId();
+                String topPanelName = topData.getPanelName();
                 String topPanelNumber = extractPanelNumber(topPanelName);
                 // Find the corresponding "bot" or "top" entry
                 boolean matchFound = false;
                 for (Data otherData : data) {
-                    if (otherData.getPanel_Barcode().equals(panelBarcode) && hasSamePanelNumber(otherData.getPanel_Name(), topPanelNumber)) {
-                        if(!otherData.getBoard_Barcode().isEmpty()){
-                            topData.setBoardBarcode(otherData.getBoard_Barcode());
+                    if (otherData.getPanelId().equals(panelId) && hasSamePanelNumber(otherData.getPanelName(), topPanelNumber)) {
+                        if(!otherData.getPcbId().isEmpty()){
+                            topData.setPcbId(otherData.getPcbId());
                             continue;
                         }
                         matchFound = true;
@@ -264,22 +292,25 @@ public class HelloController {
     }
     private String getQuery(String selectedValue) {
         Map<String, String> colMapping = new HashMap<>();
-        colMapping.put("Component", "ComponentType.TypeName");
-        colMapping.put("PanelBarcode", "PCBBarcode.Barcode");
-        colMapping.put("ShopOrder", "[Order].Name");
-        colMapping.put("PanelName", "Panel.Name");
-        colMapping.put("BoardBarcode", "TracePanel.Barcode");
-        colMapping.put("RefDesignator", "RefDesignator.Name");
-        colMapping.put("ComponentBarcode", "PackagingUnit.ComponentBarcode");
-        colMapping.put("Batch", "PackagingUnit.Batch");
-        colMapping.put("OriginalQuantity", "PackagingUnit.OriginalQuantity");
-        colMapping.put("PackagingUID", "PackagingUnit.PackagingUniqueID");
-        colMapping.put("ManufactureData", "PackagingUnit.ManufactureDate");
-        colMapping.put("MSDLevel", "PackagingUnit.MsdLevel");
-        colMapping.put("Serial", "PackagingUnit.Serial");
-        colMapping.put("ExipryDate", "PackagingUnit.ExpiryDate");
-        colMapping.put("ShopOrder", "[Order].Name");
-        colMapping.put("Station", "Station.Name");
+        colMapping.put("panelId", "PCBBarcode.Barcode");
+        colMapping.put("pcbId", "TracePanel.Barcode");
+        colMapping.put("shopOrder", "[Order].Name");
+        colMapping.put("componentPN", "Component.TypeName");
+        colMapping.put("refDesignator", "RefDesignator.Name");
+        colMapping.put("reelId", "PackagingUnit.Serial");
+        colMapping.put("tableId", "TableBarcode.Barcode");
+        colMapping.put("track", "[Location].Track");
+        colMapping.put("div", "[Location].Div");
+        colMapping.put("tower", "[Location].Tower");
+        colMapping.put("level", "[Location].Level");
+        colMapping.put("lotCode", "PackagingUnit.Batch");
+        colMapping.put("dateCode", "PackagingUnit.ManufactureDate");
+        colMapping.put("supplier", "Supplier.Name");
+        colMapping.put("station", "Station.Name");
+        colMapping.put("msdLevel", "PackagingUnit.MsdLevel");
+        colMapping.put("program", "Recipe.Name");
+
+
 
         if (selectedValue.equals("ShopOrder")) {
             return "SELECT DISTINCT\n" +
@@ -306,22 +337,27 @@ public class HelloController {
                     "Board_Barcode ASC;";
         } else {
             return "SELECT\n" +
-                    "  ComponentType.TypeName AS Component,\n" +
-                    "  PCBBarcode.Barcode AS Panel_Barcode,\n" +
-                    "  [Order].Name AS ShopOrder,\n" +
-                    "  Panel.Name AS Panel_Name,\n" +
-                    "  Station.Name AS Station,\n" +
-                    "  TracePanel.Barcode AS Board_Barcode,\n" +
+                    "  PCBBarcode.Barcode AS Panel_ID,\n" +
+                    "  TracePanel.Barcode AS PCB_ID,\n" +
+                    "   Panel.Name AS Panel_Name,\n" +
+                    "   [Order].Name AS Shop_Order,\n" +
+                    "  ComponentType.TypeName AS Component_PN,\n" +
                     "  RefDesignator.Name AS RefDesignator,\n" +
-                    "  [Order].Name AS Shop_Order,\n" +
-                    "  PackagingUnit.ComponentBarcode AS Component_Barcode,\n" +
-                    "  PackagingUnit.Batch AS Batch,\n" +
+                    "  PackagingUnit.Serial AS Reel_ID,\n" +
+                    "  TableBarcode.Barcode AS Table_ID,\n" +
+                    "  [Location].Track AS Track,\n" +
+                    "  [Location].Div AS Div,\n" +
+                    "  [Location].Tower AS Tower,\n" +
+                    "  [Location].Level AS Level,\n" +
                     "  PackagingUnit.OriginalQuantity AS Original_Quantity,\n" +
-                    "  PackagingUnit.PackagingUniqueId,\n" +
-                    "  PackagingUnit.ManufactureDate AS Manufacture_Date,\n" +
-                    "  PackagingUnit.MsdLevel,\n" +
-                    "  PackagingUnit.Serial,\n" +
-                    "  PackagingUnit.ExpiryDate AS Expiry_Date\n" +
+                    "  PackagingUnit.Batch AS Lot_Code,\n" +
+                    "  FORMAT(PackagingUnit.ManufactureDate, 'MMyy') AS Date_Code,\n" +
+                    "  Supplier.Name AS Supplier,\n" +
+                    "  Station.Name AS Station,\n" +
+                    "  PackagingUnit.MsdLevel AS Msd_Level,\n" +
+                    "  Recipe.Name AS Program,\n" +
+                    "  TraceData.BeginDate AS Begin_Date,\n" +
+                    "  TraceData.EndDate AS End_Date\n" +
                     "FROM\n" +
                     "  PCBBarcode\n" +
                     "  JOIN TraceData ON TraceData.PCBBarcodeId = PCBBarcode.Id\n" +
@@ -337,15 +373,19 @@ public class HelloController {
                     "  JOIN [Order] ON [Order].Id = Job.OrderId\n" +
                     "  JOIN PlacementGroup ON PlacementGroup.Id = Placement.PlacementGroupId\n" +
                     "  JOIN Station ON Station.Id = TraceData.StationId\n" +
+                    "  JOIN Supplier ON PackagingUnit.SupplierId = Supplier.Id\n" +
+                    "  JOIN Recipe ON Job.RecipeId = Recipe.id\n" +
+                    "  JOIN [Location] ON Charge.LocationId = [Location].Id\n" +
+                    "  JOIN TableBarcode ON [Location].TableBarcodeID = TableBarcode.id\n" +
                     "WHERE\n" +
-                    " PlacementGroup.Id IN (\n" +
+                    "  PlacementGroup.Id IN (\n" +
                     "    SELECT PlacementGroupId FROM TracePlacement WHERE TraceDataId = TraceData.Id\n" +
                     "  )\n" + "AND " +
                     colMapping.get(selectedValue) + " = ?\n" +
                     "ORDER BY\n" +
-                    "  Component ASC,\n" +
+                    "  Component_PN ASC,\n" +
                     "  Panel_Name ASC,\n" +
-                    "  Board_Barcode ASC;\n";
+                    "  PCB_ID ASC;\n";
         }
     }
 
@@ -354,7 +394,7 @@ public class HelloController {
         searchText.clear();
         data.clear();
         initialize();
-        myChoiceBox.setValue("Component");
+        myChoiceBox.setValue("pcbId");
     }
     @FXML
     void btnExportClicked(ActionEvent event) {

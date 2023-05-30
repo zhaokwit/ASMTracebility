@@ -2,136 +2,172 @@ package com.example.asmtracebility;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.fxml.FXML;
 
 public class Data {
-    private final SimpleStringProperty component;
-    private  final SimpleStringProperty panelBarcode;
-    private final SimpleStringProperty shopOrder;
+    @FXML
+    private  final SimpleStringProperty panelId;
+    private final SimpleStringProperty pcbId;
     private final SimpleStringProperty panelName;
-    private final SimpleStringProperty boardBarcode;
-    private final SimpleStringProperty station;
-   // private final SimpleStringProperty matrixIndexX;
-    //private final SimpleStringProperty matrixIndexY;
+    private final SimpleStringProperty shopOrder;
+    private final SimpleStringProperty componentPN;
     private final SimpleStringProperty refDesignator;
-    private final SimpleStringProperty componentBarcode;
-    private final SimpleStringProperty batch;
-    private final SimpleStringProperty originalQuanity;
-    private final SimpleStringProperty packagingUid;
-    private final SimpleStringProperty manufactureDate;
-   // private final SimpleStringProperty manufacturer;
+    private final SimpleStringProperty reelId;
+    private final SimpleStringProperty tableId;
+    private final SimpleStringProperty track;
+    private final SimpleStringProperty div;
+    private final SimpleStringProperty tower;
+    private final SimpleStringProperty level;
+    private final SimpleStringProperty originalQuantity;
+    private final SimpleStringProperty lotCode;
+    private final SimpleStringProperty dateCode;
+    private final SimpleStringProperty supplier;
+    private final SimpleStringProperty station;
     private final SimpleStringProperty msdLevel;
-    private final SimpleStringProperty serial;
-    //private final SimpleStringProperty supplier;
-    private final SimpleStringProperty expireDate;
+    private final SimpleStringProperty program;
+    private final SimpleStringProperty beginDate;
+    private final SimpleStringProperty endDate;
 
 
-    public Data(String component, String panelBarcode, String shopOrder, String panelName, String station, String boardBarcode, String refDesignator, String componentBarcode, String batch, String originalQuanity, String packagingUid, String manufactureDate, String msdLevel, String serial, String expireDate) {
-        this.component = new SimpleStringProperty(component);
-        this.panelBarcode = new SimpleStringProperty(panelBarcode);
-        this.shopOrder = new SimpleStringProperty(shopOrder);
+    public Data(String panelId, String pcbId, String panelName, String shopOrder, String componentPN,
+                String refDesignator, String reelId, String tableId, String track, String div,
+                String tower, String level, String originalQuantity, String lotCode, String dateCode,
+                String supplier, String station, String msdLevel, String program, String beginDate,
+                String endDate) {
+        this.panelId = new SimpleStringProperty(panelId);
+        this.pcbId = new SimpleStringProperty(pcbId);
         this.panelName = new SimpleStringProperty(panelName);
-        this.boardBarcode = new SimpleStringProperty(boardBarcode);
-        this.station = new SimpleStringProperty(station);
-        //this.matrixIndexX = new SimpleStringProperty(matrixIndexX);
-        //this.matrixIndexY = new SimpleStringProperty(matrixIndexY);
+        this.shopOrder = new SimpleStringProperty(shopOrder);
+        this.componentPN = new SimpleStringProperty(componentPN);
         this.refDesignator = new SimpleStringProperty(refDesignator);
-        this.componentBarcode = new SimpleStringProperty(componentBarcode);
-        this.batch = new SimpleStringProperty(batch);
-        this.originalQuanity = new SimpleStringProperty(originalQuanity);
-        this.packagingUid = new SimpleStringProperty(packagingUid);
-        this.manufactureDate = new SimpleStringProperty(manufactureDate);
-        //this.manufacturer = new SimpleStringProperty(manufacturer);
+        this.reelId = new SimpleStringProperty(reelId);
+        this.tableId = new SimpleStringProperty(tableId);
+        this.track = new SimpleStringProperty(track);
+        this.div = new SimpleStringProperty(div);
+        this.tower = new SimpleStringProperty(tower);
+        this.level = new SimpleStringProperty(level);
+        this.originalQuantity = new SimpleStringProperty(originalQuantity);
+        this.lotCode = new SimpleStringProperty(lotCode);
+        this.dateCode = new SimpleStringProperty(dateCode);
+        this.supplier = new SimpleStringProperty(supplier);
+        this.station = new SimpleStringProperty(station);
         this.msdLevel = new SimpleStringProperty(msdLevel);
-        this.serial = new SimpleStringProperty(serial);
-        //this.supplier = new SimpleStringProperty(supplier);
-        this.expireDate = new SimpleStringProperty(expireDate);
-
+        this.program = new SimpleStringProperty(program);
+        this.beginDate = new SimpleStringProperty(beginDate);
+        this.endDate = new SimpleStringProperty(endDate);
     }
 
-    public Data(String panelBarcode, String boardBarcode){
-        this.panelBarcode = new SimpleStringProperty(panelBarcode);
-        this.boardBarcode = new SimpleStringProperty(boardBarcode);
-        this.shopOrder = new SimpleStringProperty("");
-        this.component = new SimpleStringProperty("");
+    public Data(String panelId, String pcbId) {
+        this.panelId = new SimpleStringProperty(panelId);
+        this.pcbId = new SimpleStringProperty(pcbId);
         this.panelName = new SimpleStringProperty("");
-        this.station = new SimpleStringProperty("");
+        this.shopOrder = new SimpleStringProperty("");
+        this.componentPN = new SimpleStringProperty("");
         this.refDesignator = new SimpleStringProperty("");
-        this.componentBarcode = new SimpleStringProperty("");
-        this.batch = new SimpleStringProperty("");
-        this.originalQuanity = new SimpleStringProperty("");
-        this.packagingUid = new SimpleStringProperty("");
-        this.manufactureDate = new SimpleStringProperty("");
+        this.reelId = new SimpleStringProperty("");
+        this.tableId = new SimpleStringProperty("");
+        this.track = new SimpleStringProperty("");
+        this.div = new SimpleStringProperty("");
+        this.tower = new SimpleStringProperty("");
+        this.level = new SimpleStringProperty("");
+        this.originalQuantity = new SimpleStringProperty("");
+        this.lotCode = new SimpleStringProperty("");
+        this.dateCode = new SimpleStringProperty("");
+        this.supplier = new SimpleStringProperty("");
+        this.station = new SimpleStringProperty("");
         this.msdLevel = new SimpleStringProperty("");
-        this.serial = new SimpleStringProperty("");
-        //this.supplier = new SimpleStringProperty(supplier);
-        this.expireDate = new SimpleStringProperty("");
+        this.program = new SimpleStringProperty("");
+        this.beginDate = new SimpleStringProperty("");
+        this.endDate = new SimpleStringProperty("");
     }
 
-    public String getComponent(){
-        return component.get();
-    }
-    public String getPanel_Barcode(){
-        return panelBarcode.get();
+
+    public String getPanelId() {
+        return panelId.get();
     }
 
-    public String getShop_Order(){
-        return shopOrder.get();
+    public String getPcbId() {
+        return pcbId.get();
     }
-    public String getPanel_Name(){
+
+    public String getPanelName() {
         return panelName.get();
     }
-    public String getStation(){
-        return station.get();
+
+    public String getShopOrder() {
+        return shopOrder.get();
     }
-    public String getBoard_Barcode(){
-        return boardBarcode.get();
+
+    public String getComponentPN() {
+        return componentPN.get();
     }
-//    public String getStation(){
-//        return station.get();
-//    }
-//    public String getMatrix_Index_X(){
-//        return matrixIndexX.get();
-//    }
-//    public String getMatrix_Index_Y(){
-//        return matrixIndexY.get();
-//    }
-    public String getRef_Designator(){
+
+    public String getRefDesignator() {
         return refDesignator.get();
     }
-    public String getComponent_Barcode(){
-        return componentBarcode.get();
-    }
-    public String getBatch(){
-        return batch.get();
-    }
-    public String getOriginal_Quanity(){
-        return originalQuanity.get();
-    }
-    public String getPackaging_UID(){
-        return packagingUid.get();
-    }
-    public String getManufacture_Date(){
-        return manufactureDate.get();
+
+    public String getReelId() {
+        return reelId.get();
     }
 
-//    public String getManufacturer(){
-//        return manufacturer.get();
-//    }
-    public String getMSD_Level(){
+    public String getTableId() {
+        return tableId.get();
+    }
+
+    public String getTrack() {
+        return track.get();
+    }
+
+    public String getDiv() {
+        return div.get();
+    }
+
+    public String getTower() {
+        return tower.get();
+    }
+
+    public String getLevel() {
+        return level.get();
+    }
+
+    public String getOriginalQuantity() {
+        return originalQuantity.get();
+    }
+
+    public String getLotCode() {
+        return lotCode.get();
+    }
+
+    public String getDateCode() {
+        return dateCode.get();
+    }
+
+    public String getSupplier() {
+        return supplier.get();
+    }
+
+    public String getStation() {
+        return station.get();
+    }
+
+    public String getMsdLevel() {
         return msdLevel.get();
     }
-    public String getSerial(){
-        return serial.get();
-    }
-//    public String getSupplier(){
-//        return supplier.get();
-//    }
-    public String getExpire_Date(){
-        return expireDate.get();
+
+    public String getProgram() {
+        return program.get();
     }
 
-    public void setBoardBarcode(String boardBarcode){
-        this.boardBarcode.set(boardBarcode);
+    public String getBeginDate() {
+        return beginDate.get();
+    }
+
+    public String getEndDate() {
+        return endDate.get();
+    }
+    public void setPcbId(String pcbId){
+        this.pcbId.set(pcbId);
     }
 
 
