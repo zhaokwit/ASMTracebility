@@ -183,7 +183,6 @@ public class HelloController {
                     String panelId = resultSet.getString("Panel_ID");
                     String pcbId = resultSet.getString("PCB_ID");
 
-                   // ShopOrderData shopOrderData = new ShopOrderData(panelBarcode, boardBarcode);
                    data.add(new Data(panelId, pcbId));
 
                     dataFound = true;
@@ -337,23 +336,23 @@ public class HelloController {
                     "  TraceData.EndDate AS End_Date\n" +
                     "FROM\n" +
                     "  PCBBarcode\n" +
-                    "  JOIN TraceData ON TraceData.PCBBarcodeId = PCBBarcode.Id\n" +
-                    "  JOIN TracePanel ON TracePanel.TraceDataId = TraceData.Id\n" +
-                    "  JOIN Placement ON Placement.PanelId = TracePanel.PanelId\n" +
-                    "  JOIN Charge ON Charge.Id = Placement.ChargeId\n" +
-                    "  JOIN PackagingUnit ON PackagingUnit.Id = Charge.PackagingUnitId\n" +
-                    "  JOIN ComponentType ON ComponentType.Id = PackagingUnit.ComponentTypeId\n" +
-                    "  JOIN Panel ON Panel.Id = TracePanel.PanelId\n" +
-                    "  JOIN RefDesignator ON RefDesignator.Id = Placement.RefDesignatorId\n" +
-                    "  JOIN TraceJob ON TraceJob.TraceDataId = TraceData.Id\n" +
-                    "  JOIN Job ON Job.Id = TraceJob.JobId\n" +
-                    "  JOIN [Order] ON [Order].Id = Job.OrderId\n" +
-                    "  JOIN PlacementGroup ON PlacementGroup.Id = Placement.PlacementGroupId\n" +
-                    "  JOIN Station ON Station.Id = TraceData.StationId\n" +
-                    "  JOIN Manufacturer ON PackagingUnit.ManufacturerId = Manufacturer.Id\n" +
-                    "  JOIN Recipe ON Job.RecipeId = Recipe.id\n" +
-                    "  JOIN [Location] ON Charge.LocationId = [Location].Id\n" +
-                    "  JOIN TableBarcode ON [Location].TableBarcodeID = TableBarcode.id\n" +
+                    "  LEFT JOIN TraceData ON TraceData.PCBBarcodeId = PCBBarcode.Id\n" +
+                    "  LEFT JOIN TracePanel ON TracePanel.TraceDataId = TraceData.Id\n" +
+                    "  LEFT JOIN Placement ON Placement.PanelId = TracePanel.PanelId\n" +
+                    "  LEFT JOIN Charge ON Charge.Id = Placement.ChargeId\n" +
+                    "  LEFT JOIN PackagingUnit ON PackagingUnit.Id = Charge.PackagingUnitId\n" +
+                    "  LEFT JOIN ComponentType ON ComponentType.Id = PackagingUnit.ComponentTypeId\n" +
+                    "  LEFT JOIN Panel ON Panel.Id = TracePanel.PanelId\n" +
+                    "  LEFT JOIN RefDesignator ON RefDesignator.Id = Placement.RefDesignatorId\n" +
+                    "  LEFT JOIN TraceJob ON TraceJob.TraceDataId = TraceData.Id\n" +
+                    "  LEFT JOIN Job ON Job.Id = TraceJob.JobId\n" +
+                    "  LEFT JOIN [Order] ON [Order].Id = Job.OrderId\n" +
+                    "  LEFT JOIN PlacementGroup ON PlacementGroup.Id = Placement.PlacementGroupId\n" +
+                    "  LEFT JOIN Station ON Station.Id = TraceData.StationId\n" +
+                    "  LEFT JOIN Manufacturer ON PackagingUnit.ManufacturerId = Manufacturer.Id\n" +
+                    "  LEFT JOIN Recipe ON Job.RecipeId = Recipe.id\n" +
+                    "  LEFT JOIN [Location] ON Charge.LocationId = [Location].Id\n" +
+                    "  LEFT JOIN TableBarcode ON [Location].TableBarcodeID = TableBarcode.id\n" +
                     "WHERE\n" +
                     "  PlacementGroup.Id IN (\n" +
                     "    SELECT PlacementGroupId FROM TracePlacement WHERE TraceDataId = TraceData.Id\n" +
@@ -369,18 +368,18 @@ public class HelloController {
                     "  TracePanel.Barcode AS Board_Barcode\n" +
                     "FROM\n" +
                     "  PCBBarcode\n" +
-                    "  JOIN TraceData ON TraceData.PCBBarcodeId = PCBBarcode.Id\n" +
-                    "  JOIN TracePanel ON TracePanel.TraceDataId = TraceData.Id\n" +
-                    "  JOIN Placement ON Placement.PanelId = TracePanel.PanelId\n" +
-                    "  JOIN Charge ON Charge.Id = Placement.ChargeId\n" +
-                    "  JOIN PackagingUnit ON PackagingUnit.Id = Charge.PackagingUnitId\n" +
-                    "  JOIN ComponentType ON ComponentType.Id = PackagingUnit.ComponentTypeId\n" +
-                    "  JOIN Panel ON Panel.Id = TracePanel.PanelId\n" +
-                    "  JOIN RefDesignator ON RefDesignator.Id = Placement.RefDesignatorId\n" +
-                    "  JOIN TraceJob ON TraceJob.TraceDataId = TraceData.Id\n" +
-                    "  JOIN Job ON Job.Id = TraceJob.JobId\n" +
-                    "  JOIN [Order] ON [Order].Id = Job.OrderId\n" +
-                    "  JOIN PlacementGroup ON PlacementGroup.Id = Placement.PlacementGroupId\n" +
+                    "  LEFT JOIN TraceData ON TraceData.PCBBarcodeId = PCBBarcode.Id\n" +
+                    "  LEFT JOIN TracePanel ON TracePanel.TraceDataId = TraceData.Id\n" +
+                    "  LEFT JOIN Placement ON Placement.PanelId = TracePanel.PanelId\n" +
+                    "  LEFT JOIN Charge ON Charge.Id = Placement.ChargeId\n" +
+                    "  LEFT JOIN PackagingUnit ON PackagingUnit.Id = Charge.PackagingUnitId\n" +
+                    "  LEFT JOIN ComponentType ON ComponentType.Id = PackagingUnit.ComponentTypeId\n" +
+                    "  LEFT JOIN Panel ON Panel.Id = TracePanel.PanelId\n" +
+                    "  LEFT JOIN RefDesignator ON RefDesignator.Id = Placement.RefDesignatorId\n" +
+                    "  LEFT JOIN TraceJob ON TraceJob.TraceDataId = TraceData.Id\n" +
+                    "  LEFT JOIN Job ON Job.Id = TraceJob.JobId\n" +
+                    "  LEFT JOIN [Order] ON [Order].Id = Job.OrderId\n" +
+                    "  LEFT JOIN PlacementGroup ON PlacementGroup.Id = Placement.PlacementGroupId\n" +
                     "WHERE\n" +
                     "[Order].Name" + " = ?\n" +
                     "AND TracePanel.Barcode <> ''\n"+
@@ -411,23 +410,23 @@ public class HelloController {
                     "  TraceData.EndDate AS End_Date\n" +
                     "FROM\n" +
                     "  PCBBarcode\n" +
-                    "  JOIN TraceData ON TraceData.PCBBarcodeId = PCBBarcode.Id\n" +
-                    "  JOIN TracePanel ON TracePanel.TraceDataId = TraceData.Id\n" +
-                    "  JOIN Placement ON Placement.PanelId = TracePanel.PanelId\n" +
-                    "  JOIN Charge ON Charge.Id = Placement.ChargeId\n" +
-                    "  JOIN PackagingUnit ON PackagingUnit.Id = Charge.PackagingUnitId\n" +
-                    "  JOIN ComponentType ON ComponentType.Id = PackagingUnit.ComponentTypeId\n" +
-                    "  JOIN Panel ON Panel.Id = TracePanel.PanelId\n" +
-                    "  JOIN RefDesignator ON RefDesignator.Id = Placement.RefDesignatorId\n" +
-                    "  JOIN TraceJob ON TraceJob.TraceDataId = TraceData.Id\n" +
-                    "  JOIN Job ON Job.Id = TraceJob.JobId\n" +
-                    "  JOIN [Order] ON [Order].Id = Job.OrderId\n" +
-                    "  JOIN PlacementGroup ON PlacementGroup.Id = Placement.PlacementGroupId\n" +
-                    "  JOIN Station ON Station.Id = TraceData.StationId\n" +
-                    "  JOIN Manufacturer ON PackagingUnit.ManufacturerId = Manufacturer.Id\n" +
-                    "  JOIN Recipe ON Job.RecipeId = Recipe.id\n" +
-                    "  JOIN [Location] ON Charge.LocationId = [Location].Id\n" +
-                    "  JOIN TableBarcode ON [Location].TableBarcodeID = TableBarcode.id\n" +
+                    "  LEFT JOIN TraceData ON TraceData.PCBBarcodeId = PCBBarcode.Id\n" +
+                    "  LEFT JOIN TracePanel ON TracePanel.TraceDataId = TraceData.Id\n" +
+                    "  LEFT JOIN Placement ON Placement.PanelId = TracePanel.PanelId\n" +
+                    "  LEFT JOIN Charge ON Charge.Id = Placement.ChargeId\n" +
+                    "  LEFT JOIN PackagingUnit ON PackagingUnit.Id = Charge.PackagingUnitId\n" +
+                    "  LEFT JOIN ComponentType ON ComponentType.Id = PackagingUnit.ComponentTypeId\n" +
+                    "  LEFT JOIN Panel ON Panel.Id = TracePanel.PanelId\n" +
+                    "  LEFT JOIN RefDesignator ON RefDesignator.Id = Placement.RefDesignatorId\n" +
+                    "  LEFT JOIN TraceJob ON TraceJob.TraceDataId = TraceData.Id\n" +
+                    "  LEFT JOIN Job ON Job.Id = TraceJob.JobId\n" +
+                    "  LEFT JOIN [Order] ON [Order].Id = Job.OrderId\n" +
+                    "  LEFT JOIN PlacementGroup ON PlacementGroup.Id = Placement.PlacementGroupId\n" +
+                    "  LEFT JOIN Station ON Station.Id = TraceData.StationId\n" +
+                    "  LEFT JOIN Manufacturer ON PackagingUnit.ManufacturerId = Manufacturer.Id\n" +
+                    "  LEFT JOIN Recipe ON Job.RecipeId = Recipe.id\n" +
+                    "  LEFT JOIN [Location] ON Charge.LocationId = [Location].Id\n" +
+                    "  LEFT JOIN TableBarcode ON [Location].TableBarcodeID = TableBarcode.id\n" +
                     "WHERE\n" +
                     "  PlacementGroup.Id IN (\n" +
                     "    SELECT PlacementGroupId FROM TracePlacement WHERE TraceDataId = TraceData.Id\n" +
