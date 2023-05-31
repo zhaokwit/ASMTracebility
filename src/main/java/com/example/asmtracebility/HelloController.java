@@ -22,6 +22,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -310,9 +312,58 @@ public class HelloController {
         colMapping.put("msdLevel", "PackagingUnit.MsdLevel");
         colMapping.put("program", "Recipe.Name");
 
-
-
-        if (selectedValue.equals("ShopOrder")) {
+        if(selectedValue.equals("dateCode")) {
+            return  "SELECT\n" +
+                    "  PCBBarcode.Barcode AS Panel_ID,\n" +
+                    "  TracePanel.Barcode AS PCB_ID,\n" +
+                    "  Panel.Name AS Panel_Name,\n" +
+                    "  [Order].Name AS Shop_Order,\n" +
+                    "  ComponentType.TypeName AS Component_PN,\n" +
+                    "  RefDesignator.Name AS RefDesignator,\n" +
+                    "  PackagingUnit.Serial AS Reel_ID,\n" +
+                    "  TableBarcode.Barcode AS Table_ID,\n" +
+                    "  [Location].Track AS Track,\n" +
+                    "  [Location].Div AS Div,\n" +
+                    "  [Location].Tower AS Tower,\n" +
+                    "  [Location].Level AS Level,\n" +
+                    "  PackagingUnit.OriginalQuantity AS Original_Quantity,\n" +
+                    "  PackagingUnit.Batch AS Lot_Code,\n" +
+                    "  RIGHT(CAST(YEAR(PackagingUnit.ManufactureDate) AS VARCHAR(4)), 2) + RIGHT('0' + CAST(DATEPART(WEEK, PackagingUnit.ManufactureDate) AS VARCHAR(2)), 2) AS Date_Code,\n" +
+                    "  Supplier.Name AS Supplier,\n" +
+                    "  Station.Name AS Station,\n" +
+                    "  PackagingUnit.MsdLevel AS Msd_Level,\n" +
+                    "  Recipe.Name AS Program,\n" +
+                    "  TraceData.BeginDate AS Begin_Date,\n" +
+                    "  TraceData.EndDate AS End_Date\n" +
+                    "FROM\n" +
+                    "  PCBBarcode\n" +
+                    "  JOIN TraceData ON TraceData.PCBBarcodeId = PCBBarcode.Id\n" +
+                    "  JOIN TracePanel ON TracePanel.TraceDataId = TraceData.Id\n" +
+                    "  JOIN Placement ON Placement.PanelId = TracePanel.PanelId\n" +
+                    "  JOIN Charge ON Charge.Id = Placement.ChargeId\n" +
+                    "  JOIN PackagingUnit ON PackagingUnit.Id = Charge.PackagingUnitId\n" +
+                    "  JOIN ComponentType ON ComponentType.Id = PackagingUnit.ComponentTypeId\n" +
+                    "  JOIN Panel ON Panel.Id = TracePanel.PanelId\n" +
+                    "  JOIN RefDesignator ON RefDesignator.Id = Placement.RefDesignatorId\n" +
+                    "  JOIN TraceJob ON TraceJob.TraceDataId = TraceData.Id\n" +
+                    "  JOIN Job ON Job.Id = TraceJob.JobId\n" +
+                    "  JOIN [Order] ON [Order].Id = Job.OrderId\n" +
+                    "  JOIN PlacementGroup ON PlacementGroup.Id = Placement.PlacementGroupId\n" +
+                    "  JOIN Station ON Station.Id = TraceData.StationId\n" +
+                    "  JOIN Supplier ON PackagingUnit.SupplierId = Supplier.Id\n" +
+                    "  JOIN Recipe ON Job.RecipeId = Recipe.id\n" +
+                    "  JOIN [Location] ON Charge.LocationId = [Location].Id\n" +
+                    "  JOIN TableBarcode ON [Location].TableBarcodeID = TableBarcode.id\n" +
+                    "WHERE\n" +
+                    "  PlacementGroup.Id IN (\n" +
+                    "    SELECT PlacementGroupId FROM TracePlacement WHERE TraceDataId = TraceData.Id\n" +
+                    "  )\n" +
+                    "AND RIGHT(CAST(YEAR(PackagingUnit.ManufactureDate) AS VARCHAR(4)), 2) + RIGHT('0' + CAST(DATEPART(WEEK, PackagingUnit.ManufactureDate) AS VARCHAR(2)), 2) = ?\n" +
+                    "ORDER BY\n" +
+                    "  Component_PN ASC,\n" +
+                    "  Panel_Name ASC,\n" +
+                    "  PCB_ID ASC;\n";
+        }else if (selectedValue.equals("shopOrder")) {
             return "SELECT DISTINCT\n" +
                     "  PCBBarcode.Barcode AS Panel_Barcode,\n" +
                     "  TracePanel.Barcode AS Board_Barcode\n" +
@@ -351,7 +402,7 @@ public class HelloController {
                     "  [Location].Level AS Level,\n" +
                     "  PackagingUnit.OriginalQuantity AS Original_Quantity,\n" +
                     "  PackagingUnit.Batch AS Lot_Code,\n" +
-                    "  FORMAT(PackagingUnit.ManufactureDate, 'MMyy') AS Date_Code,\n" +
+                    "  RIGHT(CAST(YEAR(PackagingUnit.ManufactureDate) AS VARCHAR(4)), 2) + RIGHT('0' + CAST(DATEPART(WEEK, PackagingUnit.ManufactureDate) AS VARCHAR(2)), 2) AS Date_Code,\n" +
                     "  Supplier.Name AS Supplier,\n" +
                     "  Station.Name AS Station,\n" +
                     "  PackagingUnit.MsdLevel AS Msd_Level,\n" +
