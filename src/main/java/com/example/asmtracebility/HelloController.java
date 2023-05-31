@@ -307,7 +307,7 @@ public class HelloController {
         colMapping.put("level", "[Location].Level");
         colMapping.put("lotCode", "PackagingUnit.Batch");
         colMapping.put("dateCode", "PackagingUnit.ManufactureDate");
-        colMapping.put("supplier", "Supplier.Name");
+        colMapping.put("supplier", "Manufacturer.Name");
         colMapping.put("station", "Station.Name");
         colMapping.put("msdLevel", "PackagingUnit.MsdLevel");
         colMapping.put("program", "Recipe.Name");
@@ -329,7 +329,7 @@ public class HelloController {
                     "  PackagingUnit.OriginalQuantity AS Original_Quantity,\n" +
                     "  PackagingUnit.Batch AS Lot_Code,\n" +
                     "  RIGHT(CAST(YEAR(PackagingUnit.ManufactureDate) AS VARCHAR(4)), 2) + RIGHT('0' + CAST(DATEPART(WEEK, PackagingUnit.ManufactureDate) AS VARCHAR(2)), 2) AS Date_Code,\n" +
-                    "  Supplier.Name AS Supplier,\n" +
+                    "  Manufacturer.Name AS Supplier,\n" +
                     "  Station.Name AS Station,\n" +
                     "  PackagingUnit.MsdLevel AS Msd_Level,\n" +
                     "  Recipe.Name AS Program,\n" +
@@ -350,7 +350,7 @@ public class HelloController {
                     "  JOIN [Order] ON [Order].Id = Job.OrderId\n" +
                     "  JOIN PlacementGroup ON PlacementGroup.Id = Placement.PlacementGroupId\n" +
                     "  JOIN Station ON Station.Id = TraceData.StationId\n" +
-                    "  JOIN Supplier ON PackagingUnit.SupplierId = Supplier.Id\n" +
+                    "  JOIN Manufacturer ON PackagingUnit.ManufacturerId = Manufacturer.Id\n" +
                     "  JOIN Recipe ON Job.RecipeId = Recipe.id\n" +
                     "  JOIN [Location] ON Charge.LocationId = [Location].Id\n" +
                     "  JOIN TableBarcode ON [Location].TableBarcodeID = TableBarcode.id\n" +
@@ -403,7 +403,7 @@ public class HelloController {
                     "  PackagingUnit.OriginalQuantity AS Original_Quantity,\n" +
                     "  PackagingUnit.Batch AS Lot_Code,\n" +
                     "  RIGHT(CAST(YEAR(PackagingUnit.ManufactureDate) AS VARCHAR(4)), 2) + RIGHT('0' + CAST(DATEPART(WEEK, PackagingUnit.ManufactureDate) AS VARCHAR(2)), 2) AS Date_Code,\n" +
-                    "  Supplier.Name AS Supplier,\n" +
+                    "  Manufacturer.Name AS Supplier,\n" +
                     "  Station.Name AS Station,\n" +
                     "  PackagingUnit.MsdLevel AS Msd_Level,\n" +
                     "  Recipe.Name AS Program,\n" +
@@ -424,7 +424,7 @@ public class HelloController {
                     "  JOIN [Order] ON [Order].Id = Job.OrderId\n" +
                     "  JOIN PlacementGroup ON PlacementGroup.Id = Placement.PlacementGroupId\n" +
                     "  JOIN Station ON Station.Id = TraceData.StationId\n" +
-                    "  JOIN Supplier ON PackagingUnit.SupplierId = Supplier.Id\n" +
+                    "  JOIN Manufacturer ON PackagingUnit.ManufacturerId = Manufacturer.Id\n" +
                     "  JOIN Recipe ON Job.RecipeId = Recipe.id\n" +
                     "  JOIN [Location] ON Charge.LocationId = [Location].Id\n" +
                     "  JOIN TableBarcode ON [Location].TableBarcodeID = TableBarcode.id\n" +
