@@ -167,7 +167,113 @@ public class HelloController {
 
             boolean dataFound = false;
 
-            if (selectedValue.equals("ShopOrder")) {
+            if(selectedValue.equals("pcbId")){
+                myTableView.getColumns().setAll(colPanelId, colPcbId, colPanelName, colShopOrder, colComponentPN, colRefDesignator,
+                        colReelId, colTableId, colTrack, colDiv, colTower, colLevel, colOriginalQuantity, colLotCode,
+                        colDateCode, colSupplier, colStation, colMsdLevel, colProgram, colBeginDate, colEndDate);
+                statement.setString(1, searchTextValue);
+
+                ResultSet resultSet = statement.executeQuery();
+
+                if(resultSet.next()) {
+                    String dbpanelId = resultSet.getString("Panel_ID");
+
+                    //use the retrieved panlId in subsequent query
+                    String subsequentQuery = "SELECT\n" +
+                            "  PCBBarcode.Barcode AS Panel_ID,\n" +
+                            "  TracePanel.Barcode AS PCB_ID,\n" +
+                            "  Panel.Name AS Panel_Name,\n" +
+                            "  [Order].Name AS Shop_Order,\n" +
+                            "  ComponentType.TypeName AS Component_PN,\n" +
+                            "  RefDesignator.Name AS RefDesignator,\n" +
+                            "  PackagingUnit.Serial AS Reel_ID,\n" +
+                            "  TableBarcode.Barcode AS Table_ID,\n" +
+                            "  [Location].Track AS Track,\n" +
+                            "  [Location].Div AS Div,\n" +
+                            "  [Location].Tower AS Tower,\n" +
+                            "  [Location].Level AS Level,\n" +
+                            "  PackagingUnit.OriginalQuantity AS Original_Quantity,\n" +
+                            "  PackagingUnit.Batch AS Lot_Code,\n" +
+                            "  RIGHT(CAST(YEAR(PackagingUnit.ManufactureDate) AS VARCHAR(4)), 2) + RIGHT('0' + CAST(DATEPART(WEEK, PackagingUnit.ManufactureDate) AS VARCHAR(2)), 2) AS Date_Code,\n" +
+                            "  Manufacturer.Name AS Supplier,\n" +
+                            "  Station.Name AS Station,\n" +
+                            "  PackagingUnit.MsdLevel AS Msd_Level,\n" +
+                            "  Recipe.Name AS Program,\n" +
+                            "  TraceData.BeginDate AS Begin_Date,\n" +
+                            "  TraceData.EndDate AS End_Date\n" +
+                            "FROM\n" +
+                            "  PCBBarcode\n" +
+                            "  LEFT JOIN TraceData ON TraceData.PCBBarcodeId = PCBBarcode.Id\n" +
+                            "  LEFT JOIN TracePanel ON TracePanel.TraceDataId = TraceData.Id\n" +
+                            "  LEFT JOIN Placement ON Placement.PanelId = TracePanel.PanelId\n" +
+                            "  LEFT JOIN Charge ON Charge.Id = Placement.ChargeId\n" +
+                            "  LEFT JOIN PackagingUnit ON PackagingUnit.Id = Charge.PackagingUnitId\n" +
+                            "  LEFT JOIN ComponentType ON ComponentType.Id = PackagingUnit.ComponentTypeId\n" +
+                            "  LEFT JOIN Panel ON Panel.Id = TracePanel.PanelId\n" +
+                            "  LEFT JOIN RefDesignator ON RefDesignator.Id = Placement.RefDesignatorId\n" +
+                            "  LEFT JOIN TraceJob ON TraceJob.TraceDataId = TraceData.Id\n" +
+                            "  LEFT JOIN Job ON Job.Id = TraceJob.JobId\n" +
+                            "  LEFT JOIN [Order] ON [Order].Id = Job.OrderId\n" +
+                            "  LEFT JOIN PlacementGroup ON PlacementGroup.Id = Placement.PlacementGroupId\n" +
+                            "  LEFT JOIN Station ON Station.Id = TraceData.StationId\n" +
+                            "  LEFT JOIN Manufacturer ON PackagingUnit.ManufacturerId = Manufacturer.Id\n" +
+                            "  LEFT JOIN Recipe ON Job.RecipeId = Recipe.id\n" +
+                            "  LEFT JOIN [Location] ON Charge.LocationId = [Location].Id\n" +
+                            "  LEFT JOIN TableBarcode ON [Location].TableBarcodeID = TableBarcode.id\n" +
+                            "WHERE\n" +
+                            "  PlacementGroup.Id IN (\n" +
+                            "    SELECT PlacementGroupId FROM TracePlacement WHERE TraceDataId = TraceData.Id\n" +
+                            "  )\n" +
+                            "AND " + "PCBBarcode.Barcode = ?\n" +
+                            "ORDER BY\n" +
+                            "  Component_PN ASC,\n" +
+                            "  Panel_Name ASC,\n" +
+                            "  PCB_ID ASC;";
+
+                    PreparedStatement subsequentStatement = connection.prepareStatement(subsequentQuery);
+                    subsequentStatement.setString(1, dbpanelId);
+
+                    ResultSet subsequentResultSet = subsequentStatement.executeQuery();
+
+                    while (subsequentResultSet.next()) {
+                        String panelId = subsequentResultSet.getString("Panel_ID");
+                        String pcbId = subsequentResultSet.getString("PCB_ID");
+                        String panelName = subsequentResultSet.getString("Panel_Name");
+                        String shopOrder = subsequentResultSet.getString("Shop_Order");
+                        String componentPN = subsequentResultSet.getString("component_PN");
+                        String refDesignator = subsequentResultSet.getString("refDesignator");
+                        String reelId = subsequentResultSet.getString("Reel_ID");
+                        String tableId = subsequentResultSet.getString("Table_ID");
+                        String track = subsequentResultSet.getString("Track");
+                        String div = subsequentResultSet.getString("Div");
+                        String tower = subsequentResultSet.getString("Tower");
+                        String level = subsequentResultSet.getString("Level");
+                        String originalQuantity = subsequentResultSet.getString("Original_Quantity");
+                        String lotCode = subsequentResultSet.getString("Lot_Code");
+                        String dateCode = subsequentResultSet.getString("Date_Code");
+                        String supplier = subsequentResultSet.getString("Supplier");
+                        String station = subsequentResultSet.getString("Station");
+                        String msdLevel = subsequentResultSet.getString("Msd_Level");
+                        String program = subsequentResultSet.getString("Program");
+                        String beginDate = subsequentResultSet.getString("Begin_Date");
+                        String endDate = subsequentResultSet.getString("End_Date");
+
+                        //System.out.println("Imhere");
+                        dataFound = true;
+                        data.add(new Data(panelId, pcbId, panelName, shopOrder, componentPN, refDesignator, reelId, tableId, track, div, tower, level, originalQuantity, lotCode, dateCode, supplier, station, msdLevel, program, beginDate, endDate));
+
+                    }
+                }
+                    processData();
+                    filterPCB(searchTextValue);
+                    if (!dataFound) {
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle("No Data Found");
+                        alert.setHeaderText(null);
+                        alert.setContentText("No data matching the search criteria found.");
+                        alert.showAndWait();
+                    }
+            } else if (selectedValue.equals("ShopOrder")) {
                 statement.setString(1,searchTextValue);
                 // Remove the unnecessary columns
                 myTableView.getColumns().removeAll(colPanelId, colPcbId, colPanelName, colShopOrder, colComponentPN, colRefDesignator,
@@ -201,6 +307,7 @@ public class HelloController {
                         colDateCode, colSupplier, colStation, colMsdLevel, colProgram, colBeginDate, colEndDate);
 
                 statement.setString(1,searchTextValue);
+
                 ResultSet resultSet = statement.executeQuery();
                 while (resultSet.next()) {
                     String panelId = resultSet.getString("Panel_ID");
@@ -244,6 +351,16 @@ public class HelloController {
             } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    public void filterPCB(String searchTextValue){
+        List<Data> filteredData = new ArrayList<>();
+        for (Data data: data){
+            if (data.getPcbId().equals(searchTextValue)){
+                filteredData.add(data);
+            }
+        }
+        myTableView.setItems(FXCollections.observableArrayList(filteredData));
     }
 
     public void processData(){
@@ -385,6 +502,17 @@ public class HelloController {
                     "AND TracePanel.Barcode <> ''\n"+
                     "Order BY\n" +
                     "Board_Barcode ASC;";
+        } else if (selectedValue.equals("pcbId")){
+            return "SELECT\n" +
+                    "  PCBBarcode.Barcode AS Panel_ID,\n" +
+                    "  TracePanel.Barcode AS PCB_ID\n" +
+                    "FROM\n" +
+                    "  PCBBarcode\n" +
+                    "  LEFT JOIN TraceData ON TraceData.PCBBarcodeId = PCBBarcode.Id\n" +
+                    "  LEFT JOIN TracePanel ON TracePanel.TraceDataId = TraceData.Id\n" +
+                    "  LEFT JOIN Panel ON Panel.Id = TracePanel.PanelId\n" +
+                    "WHERE\n" +
+                    "TracePanel.Barcode = ?\n";
         } else {
             return "SELECT\n" +
                     "  PCBBarcode.Barcode AS Panel_ID,\n" +
