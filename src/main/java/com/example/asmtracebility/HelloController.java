@@ -39,12 +39,15 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class HelloController {
     @FXML
+    private Button reset;
+    @FXML
     private ProgressIndicator progressBar;
     @FXML
     private BorderPane borderPane;
     @FXML
     private AnchorPane myAnchorPane;
-    @FXML ScrollPane myScrollPane;
+    @FXML
+    ScrollPane myScrollPane;
     @FXML
     private TableView<Data> myTableView;
     @FXML
@@ -122,10 +125,10 @@ public class HelloController {
     private ChoiceBox<String> myChoiceBox;
 
     @FXML
-    private void initialize(){
+    private void initialize() {
         progressBar.setVisible(false);
         borderPane.setCenter(myAnchorPane);
-        myChoiceBox.setValue("pcbId");
+        reset.setOnAction(this::btnResetClicked);
         myChoiceBox.setItems(FXCollections.observableArrayList(searchOptions));
         colPanelId.setCellValueFactory(new PropertyValueFactory<>("panelId"));
         colPcbId.setCellValueFactory(new PropertyValueFactory<>("pcbId"));
@@ -160,19 +163,19 @@ public class HelloController {
         String selectedValue = myChoiceBox.getValue();
         String searchTextValue = searchText.getText();
 
-        if (searchTextValue.isEmpty()) {
+        if (searchTextValue.isEmpty() || selectedValue == null || searchTextValue.isEmpty()) {
             Platform.runLater(() -> {
-                        Alert alert = new Alert(Alert.AlertType.WARNING);
-                        alert.setTitle("Empty Search Text");
-                        alert.setHeaderText(null);
-                        alert.setContentText("Please enter a valid search text.");
-                        alert.showAndWait();
-                    });
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Empty Search Criteria");
+                alert.setHeaderText(null);
+                alert.setContentText("Please enter a valid search text and select a search option.");
+                alert.showAndWait();
+            });
             progressBar.setVisible(false);
             return;
         }
-
         data.clear();
+        myTableView.setItems(data);
 
         Thread taskThread = new Thread(() -> {
             try (Connection connection = DatabaseConnection.getConnection();
@@ -236,42 +239,48 @@ public class HelloController {
                                 "  Component_PN ASC,\n" +
                                 "  Panel_Name ASC,\n" +
                                 "  PCB_ID ASC;";
+                        try {
+                            PreparedStatement subsequentStatement = connection.prepareStatement(subsequentQuery);
+                            subsequentStatement.setString(1, dbpanelId);
 
-                            try {
-                                PreparedStatement subsequentStatement = connection.prepareStatement(subsequentQuery);
-                                subsequentStatement.setString(1, dbpanelId);
+                            ResultSet subsequentResultSet = subsequentStatement.executeQuery();
 
-                                ResultSet subsequentResultSet = subsequentStatement.executeQuery();
+                            while (subsequentResultSet.next()) {
+                                String panelId = subsequentResultSet.getString("Panel_ID");
+                                String pcbId = subsequentResultSet.getString("PCB_ID");
+                                String panelName = subsequentResultSet.getString("Panel_Name");
+                                String shopOrder = subsequentResultSet.getString("Shop_Order");
+                                String componentPN = subsequentResultSet.getString("component_PN");
+                                String refDesignator = subsequentResultSet.getString("refDesignator");
+                                String reelId = subsequentResultSet.getString("Reel_ID");
+                                String tableId = subsequentResultSet.getString("Table_ID");
+                                String track = subsequentResultSet.getString("Track");
+                                String div = subsequentResultSet.getString("Div");
+                                String tower = subsequentResultSet.getString("Tower");
+                                String level = subsequentResultSet.getString("Level");
+                                String originalQuantity = subsequentResultSet.getString("Original_Quantity");
+                                String lotCode = subsequentResultSet.getString("Lot_Code");
+                                String dateCode = subsequentResultSet.getString("Date_Code");
+                                String supplier = subsequentResultSet.getString("Supplier");
+                                String station = subsequentResultSet.getString("Station");
+                                String msdLevel = subsequentResultSet.getString("Msd_Level");
+                                String program = subsequentResultSet.getString("Program");
+                                String beginDate = subsequentResultSet.getString("Begin_Date");
+                                String endDate = subsequentResultSet.getString("End_Date");
 
-                                while (subsequentResultSet.next()) {
-                                    String panelId = subsequentResultSet.getString("Panel_ID");
-                                    String pcbId = subsequentResultSet.getString("PCB_ID");
-                                    String panelName = subsequentResultSet.getString("Panel_Name");
-                                    String shopOrder = subsequentResultSet.getString("Shop_Order");
-                                    String componentPN = subsequentResultSet.getString("component_PN");
-                                    String refDesignator = subsequentResultSet.getString("refDesignator");
-                                    String reelId = subsequentResultSet.getString("Reel_ID");
-                                    String tableId = subsequentResultSet.getString("Table_ID");
-                                    String track = subsequentResultSet.getString("Track");
-                                    String div = subsequentResultSet.getString("Div");
-                                    String tower = subsequentResultSet.getString("Tower");
-                                    String level = subsequentResultSet.getString("Level");
-                                    String originalQuantity = subsequentResultSet.getString("Original_Quantity");
-                                    String lotCode = subsequentResultSet.getString("Lot_Code");
-                                    String dateCode = subsequentResultSet.getString("Date_Code");
-                                    String supplier = subsequentResultSet.getString("Supplier");
-                                    String station = subsequentResultSet.getString("Station");
-                                    String msdLevel = subsequentResultSet.getString("Msd_Level");
-                                    String program = subsequentResultSet.getString("Program");
-                                    String beginDate = subsequentResultSet.getString("Begin_Date");
-                                    String endDate = subsequentResultSet.getString("End_Date");
+                                dataFound.set(true);
+                                data.add(new Data(panelId, pcbId, panelName, shopOrder, componentPN, refDesignator, reelId, tableId, track, div, tower, level, originalQuantity, lotCode, dateCode, supplier, station, msdLevel, program, beginDate, endDate));
 
-                                    dataFound.set(true);
-                                    data.add(new Data(panelId, pcbId, panelName, shopOrder, componentPN, refDesignator, reelId, tableId, track, div, tower, level, originalQuantity, lotCode, dateCode, supplier, station, msdLevel, program, beginDate, endDate));
+                            }
+                            processData();
+                            filterPCB(searchTextValue);
 
-                                }
-                                processData();
-                                filterPCB(searchTextValue);
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        } finally {
+                            Platform.runLater(() -> progressBar.setVisible(false));
+                        }
+                    }
                     if (!dataFound.get()) {
                         Platform.runLater(() -> {
                             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -279,18 +288,10 @@ public class HelloController {
                             alert.setHeaderText(null);
                             alert.setContentText("No data matching the search criteria found.");
                             alert.showAndWait();
+                            progressBar.setVisible(false);
                         });
                     }
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                            } finally {
-                                Platform.runLater(() -> progressBar.setVisible(false));
-                            }
-                    }
                 } else {
-//                            myTableView.getColumns().setAll(colPanelId, colPcbId, colPanelName, colShopOrder, colComponentPN, colRefDesignator,
-//                            colReelId, colTableId, colTrack, colDiv, colTower, colLevel, colOriginalQuantity, colLotCode,
-//                            colDateCode, colSupplier, colStation, colMsdLevel, colProgram, colBeginDate, colEndDate);
 
                     statement.setString(1, searchTextValue);
 
@@ -324,16 +325,16 @@ public class HelloController {
                     processData();
 
                     Platform.runLater(() -> {
-                                myTableView.setItems(data);
+                        myTableView.setItems(data);
 
-                                if (!dataFound.get()) {
-                                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                                    alert.setTitle("No Data Found");
-                                    alert.setHeaderText(null);
-                                    alert.setContentText("No data matching the search criteria found.");
-                                    alert.showAndWait();
-                                }
-                            });
+                        if (!dataFound.get()) {
+                            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                            alert.setTitle("No Data Found");
+                            alert.setHeaderText(null);
+                            alert.setContentText("No data matching the search criteria found.");
+                            alert.showAndWait();
+                        }
+                    });
                     progressBar.setVisible(false);
                 }
             } catch (SQLException | ClassNotFoundException e) {
@@ -343,17 +344,17 @@ public class HelloController {
         taskThread.start();
     }
 
-    public void filterPCB(String searchTextValue){
+    public void filterPCB(String searchTextValue) {
         List<Data> filteredData = new ArrayList<>();
-        for (Data data: data){
-            if (data.getPcbId().equals(searchTextValue)){
+        for (Data data : data) {
+            if (data.getPcbId().equals(searchTextValue)) {
                 filteredData.add(data);
             }
         }
         myTableView.setItems(FXCollections.observableArrayList(filteredData));
     }
 
-    public void processData(){
+    public void processData() {
         for (Data topData : data) {
             // Check if the boardbarcode is empty
             if (topData.getPcbId().isEmpty()) {
@@ -364,7 +365,7 @@ public class HelloController {
                 boolean matchFound = false;
                 for (Data otherData : data) {
                     if (otherData.getPanelId().equals(panelId) && hasSamePanelNumber(otherData.getPanelName(), topPanelNumber)) {
-                        if(!otherData.getPcbId().isEmpty()){
+                        if (!otherData.getPcbId().isEmpty()) {
                             topData.setPcbId(otherData.getPcbId());
                             continue;
                         }
@@ -373,9 +374,9 @@ public class HelloController {
                     }
                 }
 
-                }
             }
         }
+    }
 
     private String extractPanelNumber(String panelName) {
         StringBuilder panelNumbers = new StringBuilder();
@@ -390,6 +391,7 @@ public class HelloController {
         }
         return panelNumbers.toString();
     }
+
     private boolean hasSamePanelNumber(String panelName, String panelNumber) {
         String[] parts = panelName.split("_");
         if (parts.length >= 2) {
@@ -398,6 +400,7 @@ public class HelloController {
         }
         return false;
     }
+
     private String getQuery(String selectedValue) {
         Map<String, String> colMapping = new HashMap<>();
         colMapping.put("panelId", "PCBBarcode.Barcode");
@@ -418,8 +421,8 @@ public class HelloController {
         colMapping.put("msdLevel", "PackagingUnit.MsdLevel");
         colMapping.put("program", "Recipe.Name");
 
-        if(selectedValue.equals("dateCode")) {
-            return  "SELECT\n" +
+        if (selectedValue.equals("dateCode")) {
+            return "SELECT\n" +
                     "  PCBBarcode.Barcode AS Panel_ID,\n" +
                     "  TracePanel.Barcode AS PCB_ID,\n" +
                     "  Panel.Name AS Panel_Name,\n" +
@@ -469,7 +472,7 @@ public class HelloController {
                     "  Component_PN ASC,\n" +
                     "  Panel_Name ASC,\n" +
                     "  PCB_ID ASC;\n";
-        } else if (selectedValue.equals("pcbId")){
+        } else if (selectedValue.equals("pcbId")) {
             return "SELECT\n" +
                     "  PCBBarcode.Barcode AS Panel_ID,\n" +
                     "  TracePanel.Barcode AS PCB_ID\n" +
@@ -537,10 +540,11 @@ public class HelloController {
     @FXML
     void btnResetClicked(ActionEvent event) {
         searchText.clear();
+        myChoiceBox.getSelectionModel().clearSelection();
         data.clear();
-        initialize();
-        myChoiceBox.setValue("pcbId");
+        myTableView.setItems(data);
     }
+
     @FXML
     void btnExportClicked(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
@@ -550,22 +554,22 @@ public class HelloController {
         );
         File file = fileChooser.showSaveDialog(myTableView.getScene().getWindow());
 
-        if(file != null){
+        if (file != null) {
             XSSFWorkbook workbook = new XSSFWorkbook();
             XSSFSheet sheet = workbook.createSheet("Data");
             XSSFRow header = sheet.createRow(0);
             ObservableList<TableColumn<Data, ?>> columns = myTableView.getColumns();
-            for(int i = 0; i < columns.size(); i++){
+            for (int i = 0; i < columns.size(); i++) {
                 header.createCell(i).setCellValue(columns.get(i).getText());
             }
             ObservableList<Data> rows = myTableView.getItems();
-            for(int i = 0; i < rows.size(); i++){
-                XSSFRow sheetRow = sheet.createRow(i+1);
+            for (int i = 0; i < rows.size(); i++) {
+                XSSFRow sheetRow = sheet.createRow(i + 1);
                 Data rowData = rows.get(i);
-                for(int j = 0; j < columns.size(); j++){
+                for (int j = 0; j < columns.size(); j++) {
                     TableColumn<Data, ?> column = columns.get(j);
                     ObservableValue<?> cellValue = column.getCellObservableValue(rowData);
-                    if(cellValue != null && cellValue.getValue() != null){
+                    if (cellValue != null && cellValue.getValue() != null) {
                         String cellString = cellValue.getValue().toString();
                         sheetRow.createCell(j).setCellValue(cellString);
                     }
@@ -576,7 +580,7 @@ public class HelloController {
                 workbook.write(fileOut);
                 fileOut.close();
                 workbook.close();
-            }catch (IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
             }
 
