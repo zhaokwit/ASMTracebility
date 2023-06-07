@@ -21,6 +21,8 @@ import javafx.stage.FileChooser;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -40,6 +42,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public class HelloController {
     @FXML
     private Button reset;
+    @FXML
+    private Button search;
     @FXML
     private ProgressIndicator progressBar;
     @FXML
@@ -95,6 +99,9 @@ public class HelloController {
 
     @FXML
     private TextField searchText;
+    @FXML
+    private TextField searchText2;
+    @FXML RadioButton advancedSearch;
 
     ObservableList<Data> data = FXCollections.observableArrayList();
     List<String> searchOptions = Arrays.asList(
@@ -123,13 +130,20 @@ public class HelloController {
 
     @FXML
     private ChoiceBox<String> myChoiceBox;
+    @FXML
+    private ChoiceBox<String> myChoiceBox2;
 
     @FXML
     private void initialize() {
+        searchText2.setVisible(false);
+        myChoiceBox2.setVisible(false);
         progressBar.setVisible(false);
         borderPane.setCenter(myAnchorPane);
+        advancedSearch.setOnAction(this::btnAdvancedClicked);
+        search.setOnAction(this::btnSearchClicked);
         reset.setOnAction(this::btnResetClicked);
         myChoiceBox.setItems(FXCollections.observableArrayList(searchOptions));
+        myChoiceBox2.setItems(FXCollections.observableArrayList(searchOptions));
         colPanelId.setCellValueFactory(new PropertyValueFactory<>("panelId"));
         colPcbId.setCellValueFactory(new PropertyValueFactory<>("pcbId"));
         colPanelName.setCellValueFactory(new PropertyValueFactory<>("panelName"));
@@ -151,7 +165,18 @@ public class HelloController {
         colProgram.setCellValueFactory(new PropertyValueFactory<>("program"));
         colBeginDate.setCellValueFactory(new PropertyValueFactory<>("beginDate"));
         colEndDate.setCellValueFactory(new PropertyValueFactory<>("endDate"));
+        advancedSearch.setOnAction(event -> {
+            boolean isSelected = advancedSearch.isSelected();
+            searchText2.setVisible(isSelected);
+            myChoiceBox2.setVisible(isSelected);
+        });
 
+    }
+
+    @FXML
+    void btnAdvancedClicked(ActionEvent event){
+        searchText2.setVisible(true);
+        myChoiceBox2.setVisible(true);
     }
 
     @FXML
@@ -162,6 +187,9 @@ public class HelloController {
 
         String selectedValue = myChoiceBox.getValue();
         String searchTextValue = searchText.getText();
+
+        String selectedValue2 = myChoiceBox2.getValue();
+        String searchTextValue2 = searchText2.getText();
 
         if (searchTextValue.isEmpty() || selectedValue == null || searchTextValue.isEmpty()) {
             Platform.runLater(() -> {
@@ -273,7 +301,27 @@ public class HelloController {
 
                             }
                             processData();
-                            filterPCB(searchTextValue);
+                            List<Data> filteredData = filterPCB(searchTextValue);
+                            List<Data> filteredData2 = new ArrayList<>();
+                            if(!searchTextValue2.isEmpty() && !selectedValue2.isEmpty() && advancedSearch.isSelected()){
+                                filteredData2=filterPCB(filteredData, searchTextValue2, selectedValue2);
+                                if(!filteredData2.isEmpty()){
+                                    myTableView.setItems(FXCollections.observableArrayList(filteredData2));
+                                }else {
+                                    Platform.runLater(() -> {
+                                        data.clear();
+                                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                                        alert.setTitle("No Data Found");
+                                        alert.setHeaderText(null);
+                                        alert.setContentText("No data matching the search criteria found.");
+                                        alert.showAndWait();
+                                    });
+                                }
+                            }else {
+                                Platform.runLater(() -> {
+                                    myTableView.setItems(FXCollections.observableArrayList(filteredData));
+                                });
+                            }
 
                         } catch (SQLException e) {
                             e.printStackTrace();
@@ -344,14 +392,48 @@ public class HelloController {
         taskThread.start();
     }
 
-    public void filterPCB(String searchTextValue) {
+    public List<Data> filterPCB(String searchTextValue) {
         List<Data> filteredData = new ArrayList<>();
         for (Data data : data) {
             if (data.getPcbId().equals(searchTextValue)) {
                 filteredData.add(data);
             }
         }
-        myTableView.setItems(FXCollections.observableArrayList(filteredData));
+        return filteredData;
+    }
+    public List<Data> filterPCB(List<Data>filteredData, String searchTextValue2, String selectedValue2){
+        Map<String, String> colMapping = new HashMap<>();
+        colMapping.put("panelId", "getPanelId");
+        colMapping.put("pcbId", "getPcbId");
+        colMapping.put("shopOrder", "getShopOrder");
+        colMapping.put("componentPN", "getComponentPN");
+        colMapping.put("refDesignator", "getRefDesignator");
+        colMapping.put("reelId", "getReelId");
+        colMapping.put("tableId", "getTableId");
+        colMapping.put("track", "getTrack");
+        colMapping.put("div", "getDiv");
+        colMapping.put("tower", "getTower");
+        colMapping.put("level", "getLevel");
+        colMapping.put("lotCode", "getLotCode");
+        colMapping.put("dateCode", "getDateCode");
+        colMapping.put("supplier", "dgetSupplier");
+        colMapping.put("station", "getStation");
+        colMapping.put("msdLevel", "getMsdLevel");
+        colMapping.put("program", "getProgram");
+        List<Data> filteredData2 = new ArrayList<>();
+        for(Data data :filteredData){
+            try {
+                String colMappingMethod = colMapping.get(selectedValue2);
+                Method getter = data.getClass().getMethod(colMappingMethod);
+                String propertyValue = (String) getter.invoke(data);
+                if (propertyValue != null && propertyValue.equals(searchTextValue2)) {
+                    filteredData2.add(data);
+                }
+            }catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e){
+                e.printStackTrace();
+            }
+        }
+        return filteredData2;
     }
 
     public void processData() {

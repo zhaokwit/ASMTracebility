@@ -4,6 +4,7 @@
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -13,7 +14,7 @@
 
 <BorderPane fx:id="borderPane" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.asmtracebility.HelloController">
    <center>
-      <AnchorPane fx:id="myAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="290.0" prefWidth="879.0">
+      <AnchorPane fx:id="myAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="290.0" prefWidth="1052.0">
          <children>
             <ProgressIndicator fx:id="progressBar" layoutX="426.0" layoutY="235.0" progress="0.0" />
             <Label alignment="CENTER" contentDisplay="CENTER" layoutX="408.0" layoutY="14.0" text="ASM Studio" />
@@ -22,6 +23,9 @@
             <TextField fx:id="searchText" layoutX="318.0" layoutY="74.0" prefHeight="55.0" prefWidth="243.0" promptText="Search Here" />
             <Button fx:id="reset" layoutX="401.0" layoutY="188.0" mnemonicParsing="false" onAction="#btnResetClicked" prefHeight="33.0" prefWidth="77.0" text="Reset" />
             <Button fx:id="export" layoutX="502.0" layoutY="188.0" mnemonicParsing="false" onAction="#btnExportClicked" prefHeight="33.0" prefWidth="77.0" text="Export" />
+            <RadioButton fx:id="advancedSearch" layoutX="626.0" layoutY="31.0" mnemonicParsing="false" onAction="#btnAdvancedClicked" text="Advanced Search" />
+            <TextField fx:id="searchText2" layoutX="617.0" layoutY="74.0" prefHeight="55.0" prefWidth="243.0" promptText="Second Condition Here" />
+            <ChoiceBox fx:id="myChoiceBox2" layoutX="664.0" layoutY="144.0" prefWidth="150.0" />
          </children>
       </AnchorPane>
    </center>
