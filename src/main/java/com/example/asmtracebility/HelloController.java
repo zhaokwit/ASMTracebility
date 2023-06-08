@@ -182,6 +182,7 @@ public class HelloController {
     @FXML
     void btnSearchClicked(ActionEvent event) {
         AtomicBoolean dataFound = new AtomicBoolean(false);
+        //advancedSearch.setSelected(false);
         progressBar.setVisible(true);
         progressBar.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
 
@@ -191,12 +192,23 @@ public class HelloController {
         String selectedValue2 = myChoiceBox2.getValue();
         String searchTextValue2 = searchText2.getText();
 
-        if (searchTextValue.isEmpty() || selectedValue == null || searchTextValue.isEmpty()) {
+        if (searchTextValue.isEmpty() || selectedValue == null || selectedValue.isEmpty()) {
             Platform.runLater(() -> {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("Empty Search Criteria");
                 alert.setHeaderText(null);
                 alert.setContentText("Please enter a valid search text and select a search option.");
+                alert.showAndWait();
+            });
+            progressBar.setVisible(false);
+            return;
+        }
+        if(advancedSearch.isSelected() && (searchTextValue2.isEmpty() || selectedValue2 == null || selectedValue2.isEmpty())){
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Empty Search Criteria");
+                alert.setHeaderText(null);
+                alert.setContentText("Please enter a valid search text and select a search option for advanced search.");
                 alert.showAndWait();
             });
             progressBar.setVisible(false);
@@ -372,8 +384,28 @@ public class HelloController {
                     }
                     processData();
 
+                    List<Data> filteredData2 = new ArrayList<>();
+                    if(!searchTextValue2.isEmpty() && !selectedValue2.isEmpty() && advancedSearch.isSelected()){
+                        filteredData2=filterPCB(data, searchTextValue2, selectedValue2);
+                        if(!filteredData2.isEmpty()){
+                            myTableView.setItems(FXCollections.observableArrayList(filteredData2));
+                        }else {
+                            Platform.runLater(() -> {
+                                data.clear();
+                                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                                alert.setTitle("No Data Found");
+                                alert.setHeaderText(null);
+                                alert.setContentText("No data matching the search criteria found.");
+                                alert.showAndWait();
+                            });
+                        }
+                    }else {
+                        Platform.runLater(() -> {
+                            myTableView.setItems(FXCollections.observableArrayList(data));
+                        });
+                    }
                     Platform.runLater(() -> {
-                        myTableView.setItems(data);
+                        //myTableView.setItems(data);
 
                         if (!dataFound.get()) {
                             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -381,7 +413,9 @@ public class HelloController {
                             alert.setHeaderText(null);
                             alert.setContentText("No data matching the search criteria found.");
                             alert.showAndWait();
+                            progressBar.setVisible(false);
                         }
+
                     });
                     progressBar.setVisible(false);
                 }
