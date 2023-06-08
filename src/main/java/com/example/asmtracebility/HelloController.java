@@ -33,6 +33,13 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+
+
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -101,7 +108,8 @@ public class HelloController {
     private TextField searchText;
     @FXML
     private TextField searchText2;
-    @FXML RadioButton advancedSearch;
+    @FXML
+    RadioButton advancedSearch;
 
     ObservableList<Data> data = FXCollections.observableArrayList();
     List<String> searchOptions = Arrays.asList(
@@ -135,6 +143,39 @@ public class HelloController {
 
     @FXML
     private void initialize() {
+        MenuItem copyMenuItem = new MenuItem("Copy");
+        copyMenuItem.setOnAction(event -> {
+            StringBuilder clipboardString = new StringBuilder();
+            for (TablePosition<?, ?> position : myTableView.getSelectionModel().getSelectedCells()) {
+                int row = position.getRow();
+                int col = position.getColumn();
+
+                // Get the value from the selected cell
+                String cellValue = myTableView.getColumns().get(col).getCellData(row).toString();
+
+                // Append the cell value to the clipboard
+                clipboardString.append(cellValue).append("\n");
+            }
+
+            ClipboardContent clipboardContent = new ClipboardContent();
+            clipboardContent.putString(clipboardString.toString());
+            Clipboard.getSystemClipboard().setContent(clipboardContent);
+        });
+
+// Create the ContextMenu and add the copy MenuItem
+        ContextMenu contextMenu = new ContextMenu();
+        contextMenu.getItems().add(copyMenuItem);
+
+// Set the ContextMenu to the TableView
+        myTableView.setContextMenu(contextMenu);
+
+// Enable copy on right-click
+        myTableView.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.SECONDARY) {
+                contextMenu.show(myTableView, event.getScreenX(), event.getScreenY());
+            }
+        });
+
         searchText2.setVisible(false);
         myChoiceBox2.setVisible(false);
         progressBar.setVisible(false);
@@ -174,7 +215,7 @@ public class HelloController {
     }
 
     @FXML
-    void btnAdvancedClicked(ActionEvent event){
+    void btnAdvancedClicked(ActionEvent event) {
         searchText2.setVisible(true);
         myChoiceBox2.setVisible(true);
     }
@@ -182,7 +223,7 @@ public class HelloController {
     @FXML
     void btnSearchClicked(ActionEvent event) {
         AtomicBoolean dataFound = new AtomicBoolean(false);
-        //advancedSearch.setSelected(false);
+
         progressBar.setVisible(true);
         progressBar.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
 
@@ -203,7 +244,7 @@ public class HelloController {
             progressBar.setVisible(false);
             return;
         }
-        if(advancedSearch.isSelected() && (searchTextValue2.isEmpty() || selectedValue2 == null || selectedValue2.isEmpty())){
+        if (advancedSearch.isSelected() && (searchTextValue2.isEmpty() || selectedValue2 == null || selectedValue2.isEmpty())) {
             Platform.runLater(() -> {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("Empty Search Criteria");
@@ -315,11 +356,11 @@ public class HelloController {
                             processData();
                             List<Data> filteredData = filterPCB(searchTextValue);
                             List<Data> filteredData2 = new ArrayList<>();
-                            if(!searchTextValue2.isEmpty() && !selectedValue2.isEmpty() && advancedSearch.isSelected()){
-                                filteredData2=filterPCB(filteredData, searchTextValue2, selectedValue2);
-                                if(!filteredData2.isEmpty()){
+                            if (!searchTextValue2.isEmpty() && !selectedValue2.isEmpty() && advancedSearch.isSelected()) {
+                                filteredData2 = filterPCB(filteredData, searchTextValue2, selectedValue2);
+                                if (!filteredData2.isEmpty()) {
                                     myTableView.setItems(FXCollections.observableArrayList(filteredData2));
-                                }else {
+                                } else {
                                     Platform.runLater(() -> {
                                         data.clear();
                                         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -329,7 +370,7 @@ public class HelloController {
                                         alert.showAndWait();
                                     });
                                 }
-                            }else {
+                            } else {
                                 Platform.runLater(() -> {
                                     myTableView.setItems(FXCollections.observableArrayList(filteredData));
                                 });
@@ -385,11 +426,11 @@ public class HelloController {
                     processData();
 
                     List<Data> filteredData2 = new ArrayList<>();
-                    if(!searchTextValue2.isEmpty() && !selectedValue2.isEmpty() && advancedSearch.isSelected()){
-                        filteredData2=filterPCB(data, searchTextValue2, selectedValue2);
-                        if(!filteredData2.isEmpty()){
+                    if (!searchTextValue2.isEmpty() && !selectedValue2.isEmpty() && advancedSearch.isSelected()) {
+                        filteredData2 = filterPCB(data, searchTextValue2, selectedValue2);
+                        if (!filteredData2.isEmpty()) {
                             myTableView.setItems(FXCollections.observableArrayList(filteredData2));
-                        }else {
+                        } else {
                             Platform.runLater(() -> {
                                 data.clear();
                                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -399,7 +440,7 @@ public class HelloController {
                                 alert.showAndWait();
                             });
                         }
-                    }else {
+                    } else {
                         Platform.runLater(() -> {
                             myTableView.setItems(FXCollections.observableArrayList(data));
                         });
@@ -435,7 +476,8 @@ public class HelloController {
         }
         return filteredData;
     }
-    public List<Data> filterPCB(List<Data>filteredData, String searchTextValue2, String selectedValue2){
+
+    public List<Data> filterPCB(List<Data> filteredData, String searchTextValue2, String selectedValue2) {
         Map<String, String> colMapping = new HashMap<>();
         colMapping.put("panelId", "getPanelId");
         colMapping.put("pcbId", "getPcbId");
@@ -455,7 +497,7 @@ public class HelloController {
         colMapping.put("msdLevel", "getMsdLevel");
         colMapping.put("program", "getProgram");
         List<Data> filteredData2 = new ArrayList<>();
-        for(Data data :filteredData){
+        for (Data data : filteredData) {
             try {
                 String colMappingMethod = colMapping.get(selectedValue2);
                 Method getter = data.getClass().getMethod(colMappingMethod);
@@ -463,7 +505,7 @@ public class HelloController {
                 if (propertyValue != null && propertyValue.equals(searchTextValue2)) {
                     filteredData2.add(data);
                 }
-            }catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e){
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
         }
