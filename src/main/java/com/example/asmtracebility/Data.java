@@ -170,4 +170,10 @@ public class Data {
         this.pcbId.set(pcbId);
     }
 
+//    @Override
+//    public String toString() {
+//        return "Data [panelId=" + panelId + ", pcbId=" + pcbId + "]";
+//    }
+
+
 }

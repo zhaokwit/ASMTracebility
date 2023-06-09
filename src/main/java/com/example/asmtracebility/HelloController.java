@@ -262,13 +262,25 @@ public class HelloController {
             try (Connection connection = DatabaseConnection.getConnection();
                  PreparedStatement statement = connection.prepareStatement(getQuery(selectedValue))) {
 
-                if (selectedValue.equals("pcbId")) {
+                if (selectedValue.equals("pcbId") || selectedValue.equals("reelId") || selectedValue.equals("lotCode") || selectedValue.equals("program")) {
                     statement.setString(1, searchTextValue);
                     ResultSet resultSet = statement.executeQuery();
 
-                    if (resultSet.next()) {
-                        String dbpanelId = resultSet.getString("Panel_ID");
+                    List<String> panelIds = new ArrayList<>();
 
+                    while (resultSet.next()) {
+                        String dbpanelId = resultSet.getString("Panel_ID");
+                        panelIds.add(dbpanelId);
+                    }
+
+                    if(!panelIds.isEmpty()){
+                        StringBuilder panelIdClause = new StringBuilder();
+                        for(int i = 0; i < panelIds.size(); i++){
+                            if(i > 0 ){
+                                panelIdClause.append(",");
+                            }
+                            panelIdClause.append("?");
+                        }
                         //use the retrieved panlId in subsequent query
                         String subsequentQuery = "SELECT\n" +
                                 "  PCBBarcode.Barcode AS Panel_ID,\n" +
@@ -315,15 +327,17 @@ public class HelloController {
                                 "  PlacementGroup.Id IN (\n" +
                                 "    SELECT PlacementGroupId FROM TracePlacement WHERE TraceDataId = TraceData.Id\n" +
                                 "  )\n" +
-                                "AND " + "PCBBarcode.Barcode = ?\n" +
+                                "AND " + "PCBBarcode.Barcode IN (" + panelIdClause + ")\n" +
                                 "ORDER BY\n" +
                                 "  Component_PN ASC,\n" +
                                 "  Panel_Name ASC,\n" +
                                 "  PCB_ID ASC;";
                         try {
                             PreparedStatement subsequentStatement = connection.prepareStatement(subsequentQuery);
-                            subsequentStatement.setString(1, dbpanelId);
 
+                            for(int i = 0; i < panelIds.size(); i++) {
+                                subsequentStatement.setString(i+1, panelIds.get(i));
+                            }
                             ResultSet subsequentResultSet = subsequentStatement.executeQuery();
 
                             while (subsequentResultSet.next()) {
@@ -353,8 +367,8 @@ public class HelloController {
                                 data.add(new Data(panelId, pcbId, panelName, shopOrder, componentPN, refDesignator, reelId, tableId, track, div, tower, level, originalQuantity, lotCode, dateCode, supplier, station, msdLevel, program, beginDate, endDate));
 
                             }
-                            processData();
-                            List<Data> filteredData = filterPCB(searchTextValue);
+                            List<Data> matchedData = processData(data);
+                            List<Data> filteredData = filterPCB(matchedData,searchTextValue, selectedValue);
                             List<Data> filteredData2 = new ArrayList<>();
                             if (!searchTextValue2.isEmpty() && !selectedValue2.isEmpty() && advancedSearch.isSelected()) {
                                 filteredData2 = filterPCB(filteredData, searchTextValue2, selectedValue2);
@@ -392,8 +406,8 @@ public class HelloController {
                             progressBar.setVisible(false);
                         });
                     }
-                } else {
-
+                }
+                else {
                     statement.setString(1, searchTextValue);
 
                     ResultSet resultSet = statement.executeQuery();
@@ -423,11 +437,10 @@ public class HelloController {
                         dataFound.set(true);
                         data.add(new Data(panelId, pcbId, panelName, shopOrder, componentPN, refDesignator, reelId, tableId, track, div, tower, level, originalQuantity, lotCode, dateCode, supplier, station, msdLevel, program, beginDate, endDate));
                     }
-                    processData();
-
+                    List<Data> matchedData = processData(data);
                     List<Data> filteredData2 = new ArrayList<>();
                     if (!searchTextValue2.isEmpty() && !selectedValue2.isEmpty() && advancedSearch.isSelected()) {
-                        filteredData2 = filterPCB(data, searchTextValue2, selectedValue2);
+                        filteredData2 = filterPCB(matchedData, searchTextValue2, selectedValue2);
                         if (!filteredData2.isEmpty()) {
                             myTableView.setItems(FXCollections.observableArrayList(filteredData2));
                         } else {
@@ -442,7 +455,7 @@ public class HelloController {
                         }
                     } else {
                         Platform.runLater(() -> {
-                            myTableView.setItems(FXCollections.observableArrayList(data));
+                            myTableView.setItems(FXCollections.observableArrayList(matchedData));
                         });
                     }
                     Platform.runLater(() -> {
@@ -465,16 +478,6 @@ public class HelloController {
             }
         });
         taskThread.start();
-    }
-
-    public List<Data> filterPCB(String searchTextValue) {
-        List<Data> filteredData = new ArrayList<>();
-        for (Data data : data) {
-            if (data.getPcbId().equals(searchTextValue)) {
-                filteredData.add(data);
-            }
-        }
-        return filteredData;
     }
 
     public List<Data> filterPCB(List<Data> filteredData, String searchTextValue2, String selectedValue2) {
@@ -512,7 +515,7 @@ public class HelloController {
         return filteredData2;
     }
 
-    public void processData() {
+    public List<Data> processData(List<Data> data) {
         for (Data topData : data) {
             // Check if the boardbarcode is empty
             if (topData.getPcbId().isEmpty()) {
@@ -534,6 +537,7 @@ public class HelloController {
 
             }
         }
+        return data;
     }
 
     private String extractPanelNumber(String panelName) {
@@ -641,7 +645,20 @@ public class HelloController {
                     "  LEFT JOIN Panel ON Panel.Id = TracePanel.PanelId\n" +
                     "WHERE\n" +
                     "TracePanel.Barcode = ?\n";
-        } else {
+        }
+        else if (selectedValue.equals("reelId")) {
+            return "SELECT\n" +
+                    "  PCBBarcode.Barcode AS Panel_ID\n" +
+                    "FROM\n" +
+                    "  PCBBarcode\n" +
+                    "  LEFT JOIN TraceData ON TraceData.PCBBarcodeId = PCBBarcode.Id\n" +
+                    "  LEFT JOIN TracePanel ON TracePanel.TraceDataId = TraceData.Id\n" +
+                    "  LEFT JOIN Placement ON Placement.PanelId = TracePanel.PanelId\n" +
+                    "  LEFT JOIN Charge ON Charge.Id = Placement.ChargeId\n" +
+                    "  LEFT JOIN PackagingUnit ON PackagingUnit.Id = Charge.PackagingUnitId\n" +
+                    "WHERE\n" +
+                    "PackagingUnit.Serial = ?\n";
+        }else {
             return "SELECT\n" +
                     "  PCBBarcode.Barcode AS Panel_ID,\n" +
                     "  TracePanel.Barcode AS PCB_ID,\n" +
