@@ -7,7 +7,7 @@ import java.sql.SQLException;
 
 public class DatabaseConnection {
     public static Connection getConnection() throws SQLException, ClassNotFoundException{
-        String connectionString = "jdbc:sqlserver://localhost:1433;databaseName=ASMTraceabilityDb2;encrypt=true;trustServerCertificate=true;integratedSecurity=true";
+        String connectionString = "jdbc:sqlserver://localhost:57231;databaseName=ASMTraceabilityDb;user=asmadmin;password=ewbsmt;encrypt=true;trustServerCertificate=true;";
         Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
         Connection connection = DriverManager.getConnection(connectionString);
         return connection;

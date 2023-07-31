@@ -262,7 +262,7 @@ public class HelloController {
             try (Connection connection = DatabaseConnection.getConnection();
                  PreparedStatement statement = connection.prepareStatement(getQuery(selectedValue))) {
 
-                if (selectedValue.equals("pcbId") || selectedValue.equals("reelId") || selectedValue.equals("lotCode") || selectedValue.equals("program")) {
+                if (selectedValue.equals("pcbId")) {
                     statement.setString(1, searchTextValue);
                     ResultSet resultSet = statement.executeQuery();
 
@@ -298,7 +298,7 @@ public class HelloController {
                                 "  PackagingUnit.OriginalQuantity AS Original_Quantity,\n" +
                                 "  PackagingUnit.Batch AS Lot_Code,\n" +
                                 "  RIGHT(CAST(YEAR(PackagingUnit.ManufactureDate) AS VARCHAR(4)), 2) + RIGHT('0' + CAST(DATEPART(WEEK, PackagingUnit.ManufactureDate) AS VARCHAR(2)), 2) AS Date_Code,\n" +
-                                "  Manufacturer.Name AS Supplier,\n" +
+                                "  Supplier.Name AS Supplier,\n" +
                                 "  Station.Name AS Station,\n" +
                                 "  PackagingUnit.MsdLevel AS Msd_Level,\n" +
                                 "  Recipe.Name AS Program,\n" +
@@ -319,7 +319,7 @@ public class HelloController {
                                 "  LEFT JOIN [Order] ON [Order].Id = Job.OrderId\n" +
                                 "  LEFT JOIN PlacementGroup ON PlacementGroup.Id = Placement.PlacementGroupId\n" +
                                 "  LEFT JOIN Station ON Station.Id = TraceData.StationId\n" +
-                                "  LEFT JOIN Manufacturer ON PackagingUnit.ManufacturerId = Manufacturer.Id\n" +
+                                "  LEFT JOIN Supplier ON PackagingUnit.SupplierId = Supplier.Id\n" +
                                 "  LEFT JOIN Recipe ON Job.RecipeId = Recipe.id\n" +
                                 "  LEFT JOIN [Location] ON Charge.LocationId = [Location].Id\n" +
                                 "  LEFT JOIN TableBarcode ON [Location].TableBarcodeID = TableBarcode.id\n" +
@@ -568,7 +568,7 @@ public class HelloController {
         colMapping.put("panelId", "PCBBarcode.Barcode");
         colMapping.put("pcbId", "TracePanel.Barcode");
         colMapping.put("shopOrder", "[Order].Name");
-        colMapping.put("componentPN", "Component.TypeName");
+        colMapping.put("componentPN", "ComponentType.TypeName");
         colMapping.put("refDesignator", "RefDesignator.Name");
         colMapping.put("reelId", "PackagingUnit.Serial");
         colMapping.put("tableId", "TableBarcode.Barcode");
@@ -600,7 +600,7 @@ public class HelloController {
                     "  PackagingUnit.OriginalQuantity AS Original_Quantity,\n" +
                     "  PackagingUnit.Batch AS Lot_Code,\n" +
                     "  RIGHT(CAST(YEAR(PackagingUnit.ManufactureDate) AS VARCHAR(4)), 2) + RIGHT('0' + CAST(DATEPART(WEEK, PackagingUnit.ManufactureDate) AS VARCHAR(2)), 2) AS Date_Code,\n" +
-                    "  Manufacturer.Name AS Supplier,\n" +
+                    "  Supplier.Name AS Supplier,\n" +
                     "  Station.Name AS Station,\n" +
                     "  PackagingUnit.MsdLevel AS Msd_Level,\n" +
                     "  Recipe.Name AS Program,\n" +
@@ -621,7 +621,7 @@ public class HelloController {
                     "  LEFT JOIN [Order] ON [Order].Id = Job.OrderId\n" +
                     "  LEFT JOIN PlacementGroup ON PlacementGroup.Id = Placement.PlacementGroupId\n" +
                     "  LEFT JOIN Station ON Station.Id = TraceData.StationId\n" +
-                    "  LEFT JOIN Manufacturer ON PackagingUnit.ManufacturerId = Manufacturer.Id\n" +
+                    "  LEFT JOIN Supplier ON PackagingUnit.SupplierId = Supplier.Id\n" +
                     "  LEFT JOIN Recipe ON Job.RecipeId = Recipe.id\n" +
                     "  LEFT JOIN [Location] ON Charge.LocationId = [Location].Id\n" +
                     "  LEFT JOIN TableBarcode ON [Location].TableBarcodeID = TableBarcode.id\n" +
@@ -646,19 +646,20 @@ public class HelloController {
                     "WHERE\n" +
                     "TracePanel.Barcode = ?\n";
         }
-        else if (selectedValue.equals("reelId")) {
-            return "SELECT\n" +
-                    "  PCBBarcode.Barcode AS Panel_ID\n" +
-                    "FROM\n" +
-                    "  PCBBarcode\n" +
-                    "  LEFT JOIN TraceData ON TraceData.PCBBarcodeId = PCBBarcode.Id\n" +
-                    "  LEFT JOIN TracePanel ON TracePanel.TraceDataId = TraceData.Id\n" +
-                    "  LEFT JOIN Placement ON Placement.PanelId = TracePanel.PanelId\n" +
-                    "  LEFT JOIN Charge ON Charge.Id = Placement.ChargeId\n" +
-                    "  LEFT JOIN PackagingUnit ON PackagingUnit.Id = Charge.PackagingUnitId\n" +
-                    "WHERE\n" +
-                    "PackagingUnit.Serial = ?\n";
-        }else {
+//        else if (selectedValue.equals("reelId")) {
+//            return "SELECT\n" +
+//                    "  PCBBarcode.Barcode AS Panel_ID\n" +
+//                    "FROM\n" +
+//                    "  PCBBarcode\n" +
+//                    "  LEFT JOIN TraceData ON TraceData.PCBBarcodeId = PCBBarcode.Id\n" +
+//                    "  LEFT JOIN TracePanel ON TracePanel.TraceDataId = TraceData.Id\n" +
+//                    "  LEFT JOIN Placement ON Placement.PanelId = TracePanel.PanelId\n" +
+//                    "  LEFT JOIN Charge ON Charge.Id = Placement.ChargeId\n" +
+//                    "  LEFT JOIN PackagingUnit ON PackagingUnit.Id = Charge.PackagingUnitId\n" +
+//                    "WHERE\n" +
+//                    "PackagingUnit.Serial = ?\n";
+//        }
+        else {
             return "SELECT\n" +
                     "  PCBBarcode.Barcode AS Panel_ID,\n" +
                     "  TracePanel.Barcode AS PCB_ID,\n" +
@@ -675,7 +676,7 @@ public class HelloController {
                     "  PackagingUnit.OriginalQuantity AS Original_Quantity,\n" +
                     "  PackagingUnit.Batch AS Lot_Code,\n" +
                     "  RIGHT(CAST(YEAR(PackagingUnit.ManufactureDate) AS VARCHAR(4)), 2) + RIGHT('0' + CAST(DATEPART(WEEK, PackagingUnit.ManufactureDate) AS VARCHAR(2)), 2) AS Date_Code,\n" +
-                    "  Manufacturer.Name AS Supplier,\n" +
+                    "  Supplier.Name AS Supplier,\n" +
                     "  Station.Name AS Station,\n" +
                     "  PackagingUnit.MsdLevel AS Msd_Level,\n" +
                     "  Recipe.Name AS Program,\n" +
@@ -696,7 +697,7 @@ public class HelloController {
                     "  LEFT JOIN [Order] ON [Order].Id = Job.OrderId\n" +
                     "  LEFT JOIN PlacementGroup ON PlacementGroup.Id = Placement.PlacementGroupId\n" +
                     "  LEFT JOIN Station ON Station.Id = TraceData.StationId\n" +
-                    "  LEFT JOIN Manufacturer ON PackagingUnit.ManufacturerId = Manufacturer.Id\n" +
+                    "  LEFT JOIN Supplier ON PackagingUnit.SupplierId = Supplier.Id\n" +
                     "  LEFT JOIN Recipe ON Job.RecipeId = Recipe.id\n" +
                     "  LEFT JOIN [Location] ON Charge.LocationId = [Location].Id\n" +
                     "  LEFT JOIN TableBarcode ON [Location].TableBarcodeID = TableBarcode.id\n" +
